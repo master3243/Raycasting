@@ -52,9 +52,9 @@ public class GUI  extends JComponent {
 //			g.setColor(color);
 			double x = rectangles.get(i).x;
 //			int x = rectangles.get(i).x;
-			int y = rectangles.get(i).y;
-			int width = rectangles.get(i).width;
-			int height = rectangles.get(i).height;
+			double y = rectangles.get(i).y;
+			double width = rectangles.get(i).width;
+			double height = rectangles.get(i).height;
 
 //			g.fillRect(x, y, width, height);
 		}

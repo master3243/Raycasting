@@ -66,11 +66,11 @@ public class GenerateMap {
 	
 	public ArrayList<Wall> walls = new ArrayList<>();
 
-	public void generateSquare(int x1, int y1, int x2, int y2){
+	public void generateSquare(double x1, double y1, double x2, double y2){
 		generateSquare(x1, y1, x2, y2, new Color(0, 0, 0));
 	}
 	
-	public void generateSquare(int x1, int y1, int x2, int y2, Color color){
+	public void generateSquare(double x1, double y1, double x2, double y2, Color color){
 		walls.add(new Wall(x1, y1, x2, y1, color));
 		walls.add(new Wall(x2, y1, x2, y2, color.darker()));
 		walls.add(new Wall(x2, y2, x1, y2, color));

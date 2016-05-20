@@ -48,6 +48,7 @@ public class Map {
 		map.generateSquare(10, -70, 20, -80, new Color(100, 100, 0));		
 		map.generateSquare(50, -10, 80, -40, new Color(0, 100, 100));
 		map.generateSquare(50, -10, 80, -40, new Color(0, 100, 100));
+		map.generateSquare(100, -1, 120, -10, new Color(45, 134, 100));
 		
 		Color color = new Color(30, 70, 60);
 		map.walls.add(new Wall(30, -45, 31, -50, color));

@@ -30,12 +30,11 @@ public class RectanglesComponent extends JComponent {
 		for (int i = 0; i < rectangles.size(); i++) {
 			Color color = new Color(rectangles.get(i).color.getRGB());
 			g.setColor(color);
-			//int x = rectangles.get(i).x;
+
 			double x = rectangles.get(i).x;
-			
-			int y = rectangles.get(i).y;
-			int width = rectangles.get(i).width;
-			int height = rectangles.get(i).height;
+			double y = rectangles.get(i).y;
+			double width = rectangles.get(i).width;
+			double height = rectangles.get(i).height;
 			
 
 			Rectangle2D rect = new Rectangle2D.Double(x, y, width, height);
@@ -43,7 +42,7 @@ public class RectanglesComponent extends JComponent {
 			g2.setPaint(color);
 			g2.fill(rect);
 
-//			g.fillRect(x, y, width, height);
+//			g.fillRect((int) x, (int) y, (int) width, (int) height);
 //			g.drawLine(x, y, x, y+height);
 		}
 	}
@@ -60,14 +59,14 @@ public class RectanglesComponent extends JComponent {
 		initUI();
 		initGame();
 		int milliSecondsBetweenFrames = 1000 / World.FPS;
-		
 		while (true) {
 			try {
 				Thread.sleep(milliSecondsBetweenFrames);
 			} catch (InterruptedException e) {
 				e.printStackTrace();
 			}
-			gameUpdate();
+			
+			comp.gameUpdate();
 		}
 
 	}
@@ -104,12 +103,12 @@ public class RectanglesComponent extends JComponent {
 		player.setPoint(new Point2D.Double(40, -42));
 	}
 	
-	static void gameUpdate(){
+	void gameUpdate(){
 		keyboard_check();
 		drawWalls();
 	}
 	
-	static void keyboard_check(){
+	void keyboard_check(){
 		keyboard.poll();
 		if(keyboard.keyDown(KeyEvent.VK_W))
 			player.moveOneFrameForward();
@@ -123,10 +122,17 @@ public class RectanglesComponent extends JComponent {
 			player.rotateOneFrameRight();
 		if(keyboard.keyDown(KeyEvent.VK_LEFT))
 			player.rotateOneFrameLeft();
+		if(keyboard.keyDown(KeyEvent.VK_UP))
+			if(constantOfY < 300)
+				constantOfY += 10;
+		if(keyboard.keyDown(KeyEvent.VK_DOWN))
+			if(constantOfY > -300)
+				constantOfY -= 10;
+		
 		
 	}
-	
-	static void drawWalls() {
+	static double constantOfY = 0;
+	public void drawWalls() {
 		comp.clearRectangle();
 		WallProperties[] walls = map.generateWallPropertiesArray(player);
 		// Color[] colors = map
@@ -134,24 +140,31 @@ public class RectanglesComponent extends JComponent {
 			// System.out.println(distances[i]);
 			if (walls[i] == null)
 				continue;
-			int width = widthOfWindow / walls.length;
-			int x = widthOfWindow - 1 - (i * width);
-			int y = heightOfWindow / 4;
+			double width = widthOfWindow / walls.length;
+			double x = widthOfWindow - 1 - (i * width);
+			double y = heightOfWindow / 4 + constantOfY;
 			//int height = (int) (2.0 * 2500 / (walls[i].distance));
-			int height = (int) (5000/walls[i].distance);
+			double height = (5000/walls[i].distance);
+				
+//			System.out.println(y);
+			
 			Color color = walls[i].color;
+			
 			comp.addRectangle(x, y - height / 2, width, height, color);
 		}
+		repaint();
 	}
 	
-	public void addRectangle(int x, int y, int width, int height, Color color) {
+	public void addRectangle(double x, double y, double width, double height, Color color) {
 		rectangles.add(new Rectangle(x, y, width, height, color));
-		repaint();
 	}
 
 	public void clearRectangle() {
 		rectangles.clear();
-		repaint();
+		rectangles.add(new Rectangle(0, heightOfWindow / 4 + constantOfY, widthOfWindow, heightOfWindow, new Color(100, 10, 50)));
+		rectangles.add(new Rectangle(0, 0, widthOfWindow, heightOfWindow / 4 + constantOfY, new Color(130, 130, 150)));
+		
+	
 	}
 	
 }
