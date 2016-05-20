@@ -14,16 +14,23 @@ public class Player {
 	private double x = 0;
 	private double y = 0;
 	private Direction lookingDirection = new Direction(0);
-
+	private Map map;
+	private double MIN_DISTANCE_FROM_WALL = 2;
+	
 	public int millisecondsBetweenTicks = World.millisecondsBetweenTicks;
 
-	private double movementInOneSecond = 50;
+	private double movementInOneSecond = 20;
 	private double movementInOneTick = movementInOneSecond / World.FPS;
 	private double rotationInOneSecond = 180;
 	private double rotationInOneTick = rotationInOneSecond / World.FPS;
 	
 	public Player(){
+		this(null);
+	}
+	
+	public Player(Map map){
 		initTimers();
+		this.map = map;
 	}
 	
 	public void setPoint(Point2D point) {
@@ -50,8 +57,23 @@ public class Player {
 	}
 
 	public void moveOneFrame(Direction direction) {
-		x += movementInOneTick * Math.cos(Math.toRadians(direction.getDirectionNumber()));
-		y += movementInOneTick * Math.sin(Math.toRadians(direction.getDirectionNumber()));
+		double changeInX = movementInOneTick * Math.cos(Math.toRadians(direction.getDirectionNumber()));
+		int signOfChangeInX = (int) Math.signum(changeInX);
+		double minDistanceFromWallInX = MIN_DISTANCE_FROM_WALL * signOfChangeInX;
+		double changeInY = movementInOneTick * Math.sin(Math.toRadians(direction.getDirectionNumber()));
+		int signOfChangeInY = (int) Math.signum(changeInY);
+		double minDistanceFromWallInY = MIN_DISTANCE_FROM_WALL * signOfChangeInY;
+		
+		Point2D newXPos = new Point2D.Double(x + changeInX + minDistanceFromWallInX, y);
+		Point2D newYPos = new Point2D.Double(x, y + changeInY + minDistanceFromWallInY);
+		
+		if(!map.canMove(getPoint(), newXPos))
+			changeInX = 0;
+		if(!map.canMove(getPoint(), newYPos))
+			changeInY = 0;
+		
+		x += changeInX;
+		y += changeInY;
 	}
 
 	public void moveOneFrameForward() {

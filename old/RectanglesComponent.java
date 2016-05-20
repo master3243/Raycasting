@@ -98,7 +98,7 @@ public class RectanglesComponent extends JComponent {
 	static void initGame() {
 		map = new Map();
 		Map.generateMap(map, 3);
-		player = new Player();
+		player = new Player(map);
 		player.setLookingDirection(new Direction(150));
 		player.setPoint(new Point2D.Double(40, -42));
 	}

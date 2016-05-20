@@ -148,6 +148,13 @@ public class Map {
 		}
 		return result;
 	}
+	
+	public boolean canMove(Point2D oldPos, Point2D newPos){
+		Line2D changeInPosition = new Line2D.Double(oldPos, newPos);
+		ArrayList<Wall> colidingWalls = getCollidingWalls(changeInPosition);
+		boolean noIntersections = colidingWalls.isEmpty();
+		return noIntersections;
+	}
 
 	// from http://www.java-gaming.org/index.php?topic=22590.0
 	public static Point2D getLineLineIntersection(Line2D a, Line2D b) {
