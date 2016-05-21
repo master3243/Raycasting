@@ -72,21 +72,23 @@ public class DataToGUI {
 	}
 
 	private ArrayList<Rectangle> wallPropertiesToRectangles(Map map, Player player) {
-		WallProperties[] wallProp = map.generateWallPropertiesArray(player);
+		WallProperties[] wallProperties = map.generateWallPropertiesArray(player);
 		ArrayList<Rectangle> result = new ArrayList<Rectangle>();
 
-		int numOfRetangles = wallProp.length; // World.width_resolution
+		int numOfRetangles = wallProperties.length; // World.width_resolution
 		double widthOfRectangle = (double) gui.widthOfWindow / numOfRetangles;
 		double heightOfEyeLevel = player.getLookingDirectionZAxis();
 
-		for (int i = 0; i < wallProp.length; i++) {
-			if (wallProp[i] == null) {
+		for (int i = 0; i < wallProperties.length; i++) {
+			if (wallProperties[i] == null) {
 				continue;
 			}
 			double x = gui.widthOfWindow - widthOfRectangle * (i + 1);
-			double height = (5000 / wallProp[i].distance);
+			double height = (5000 / wallProperties[i].distance);
+//			double height = (500 - wallProp[i].distance*10); trying out different methods,, not good
+			
 			double y = gui.heightOfWindow / 2 + heightOfEyeLevel - height / 2;
-			Color color = wallProp[i].color;
+			Color color = wallProperties[i].color;
 
 			result.add(new Rectangle(x, y, widthOfRectangle, height, color));
 		}
@@ -96,10 +98,11 @@ public class DataToGUI {
 	private Rectangle[] getBackground() {
 		Rectangle[] result = new Rectangle[2];
 		double middleOfLookingDirectionZAxis = gui.heightOfWindow / 2 + player.getLookingDirectionZAxis();
-
+		
 		Rectangle sky = new Rectangle(0, 0, gui.widthOfWindow, middleOfLookingDirectionZAxis, skyColor);
-		Rectangle ground = new Rectangle(0, middleOfLookingDirectionZAxis, gui.widthOfWindow, gui.heightOfWindow,
-				groundColor);
+		Rectangle ground = new Rectangle(0, middleOfLookingDirectionZAxis, gui.widthOfWindow
+				, gui.heightOfWindow - middleOfLookingDirectionZAxis
+				, groundColor);
 
 		result[0] = sky;
 		result[1] = ground;

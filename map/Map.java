@@ -30,6 +30,10 @@ public class Map {
 		case 3:
 			MapData.generateMap3(this);
 			break;
+		case 4:
+			MapData.generateMap4(this);
+			break;
+		
 		}
 	}
 	
@@ -48,13 +52,14 @@ public class Map {
 	public WallProperties[] generateWallPropertiesArray(Player player) {
 		
 		WallProperties[] result = new WallProperties[World.width_resolution];
-		double degreeBetweenRays = player.degreeBetweenRays;
+		double degreeBetweenRays = player.getDegreeBetweenRays();
 		double playerDirection = player.getLookingDirection().getDirectionNumber();
 		Point2D playerPosition = player.getPoint();
 		double rightMostPixel = playerDirection - (player.pov / 2);
 
 		for (int i = 0; i < World.width_resolution; i++) {
 			Direction rayDirection = new Direction(rightMostPixel + (degreeBetweenRays * i));
+//			System.out.println(degreeBetweenRays * i);
 			
 			double endXAxisOfRay = playerPosition.getX() + 
 					World.draw_distance * Math.cos(Math.toRadians(rayDirection.getDirectionNumber()));

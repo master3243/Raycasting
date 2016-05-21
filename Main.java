@@ -28,28 +28,29 @@ public class Main {
 		
 		
 		GUI gui = new GUI(600, 740);
-		Map map = new Map(3);
+		Map map = new Map(4);
 		int[] controls1 = new int[]{KeyEvent.VK_W, KeyEvent.VK_A, KeyEvent.VK_S, KeyEvent.VK_D, KeyEvent.VK_RIGHT, KeyEvent.VK_LEFT, KeyEvent.VK_UP, KeyEvent.VK_DOWN, KeyEvent.VK_SHIFT};
 		Player player = new Player(map, 1, new Color(255, 0, 200), controls1);
-		player.setPoint(new Point2D.Double(40, -42));
-		player.setLookingDirection(new Direction(150));
+		player.setPoint(new Point2D.Double(15, -35));
+		player.setLookingDirection(new Direction(90));
 		players[0] = player;
 		DataToGUI base = new DataToGUI(gui, map, player);
 		
 		GUI gui2 = new GUI(600, 740);
 		gui2.frame.setLocation(700, 0);
-		Map map2 = new Map(3);
+		Map map2 = new Map(4);
 		int[] controls2 = new int[]{KeyEvent.VK_I, KeyEvent.VK_J, KeyEvent.VK_K, KeyEvent.VK_L, KeyEvent.VK_NUMPAD6, KeyEvent.VK_NUMPAD4, KeyEvent.VK_NUMPAD8, KeyEvent.VK_NUMPAD5, KeyEvent.VK_NUMPAD0};
 		Player player2 = new Player(map2, 2, new Color(255, 215, 0), controls2);
-		player2.setPoint(new Point2D.Double(45, -42));
-		player2.setLookingDirection(new Direction(150));
+		player2.setPoint(new Point2D.Double(195, -35));
+		player2.setLookingDirection(new Direction(90));
 		players[1] = player2;
 		DataToGUI base2 = new DataToGUI(gui2, map2, player2);
 		
+		GUI keyboardGUI = gui2;
 		keyboard = new KeyboardInput();
-		gui2.frame.addKeyListener(keyboard);
-		gui2.frame.setFocusable(true);
-		gui2.frame.requestFocusInWindow();
+		keyboardGUI.frame.addKeyListener(keyboard);
+		keyboardGUI.frame.setFocusable(true);
+		keyboardGUI.frame.requestFocusInWindow();
 		
 		
 		while (true) {

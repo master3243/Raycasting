@@ -24,6 +24,7 @@ public class Player {
 	private boolean isRunning = false;
 	public int pov = originalPOV;
 	
+	
 	private double movementInOneSecond = 20;
 	private double rotationInOneSecond = 180;
 	private double movementInOneTick = movementInOneSecond / World.FPS;
@@ -38,9 +39,9 @@ public class Player {
 	private double runningDistanceInOneTick = runningDistanceInOneSecond / World.FPS;
 //	private double cooldownDurationInSeconds = 1;
 	
+	
 	public static final int originalPOV = 120;
-	public static int millisecondsBetweenTicks = World.millisecondsBetweenTicks;
-	public double degreeBetweenRays = pov * 1.0 / World.width_resolution;
+	public static final int millisecondsBetweenTicks = World.millisecondsBetweenTicks;
 	public int playerNumber;
 	public Color playerColor;
 	
@@ -81,6 +82,10 @@ public class Player {
 			return runningDistanceInOneTick;
 		else
 			return movementInOneTick;
+	}
+	
+	public double getDegreeBetweenRays(){
+		return pov * 1.0 / World.width_resolution;
 	}
 
 	public void moveOneFrame(Direction direction) {
@@ -132,13 +137,23 @@ public class Player {
 		getLookingDirection().addDirection(-1 * rotationInOneTick);
 	}
 	
+	public void lookUpOneFrame(){
+		if (lookingDirectionZAxis > -350)
+			lookingDirectionZAxis += -10;
+	}
+	
+	public void lookDownOneFrame(){
+		if (lookingDirectionZAxis < 400)
+			lookingDirectionZAxis += 10;
+	}
+	
 	private void staminaUpdate(boolean buttonActive){
 		pov = originalPOV;
 		if(buttonActive && staminaPercentage > 0){
 			isRunning = true;
 			decreaseStamina();
 			pov += 20;
-		} else{
+		} else {
 			increaseStamina();
 			isRunning = false;
 		}
@@ -175,11 +190,9 @@ public class Player {
 		if (KB.keyDown(controls[5]))
 			rotateOneFrameLeft();
 		if (KB.keyDown(controls[6]))
-			if (lookingDirectionZAxis < 400)
-				lookingDirectionZAxis += 10;
+			lookDownOneFrame();
 		if (KB.keyDown(controls[7]))
-			if (lookingDirectionZAxis > -350)
-				lookingDirectionZAxis += -10;
+			lookUpOneFrame();
 	}
 
 }
