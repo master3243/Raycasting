@@ -95,6 +95,12 @@ public class Map {
 		return false;
 	}
 
+	public boolean canMove(Point2D from, Point2D to) {
+		Line2D changeInPosition = new Line2D.Double(from, to);
+		boolean collidesWithWall = collidesWithWall(changeInPosition);
+		return !collidesWithWall;
+	}
+
 	
 
 }

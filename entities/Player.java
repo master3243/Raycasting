@@ -4,12 +4,10 @@
  */
 package raycasting.entities;
 
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
+import java.awt.event.KeyEvent;
 import java.awt.geom.Point2D;
-import javax.swing.Timer;
-
 import raycasting.Direction;
+import raycasting.keyboard.KeyboardInput;
 import raycasting.map.Map;
 import raycasting.old.World;
 
@@ -18,10 +16,10 @@ public class Player {
 	private double x = 0;
 	private double y = 0;
 	private Direction lookingDirection = new Direction(0);
-	private Direction lookingDirectionZAxis = new Direction(0);
+	private double lookingDirectionZAxis = 0;
 	private Map map;
 	private double MIN_DISTANCE_FROM_WALL = 2;
-	
+
 	private double movementInOneSecond = 20;
 	private double rotationInOneSecond = 180;
 	private double movementInOneTick = movementInOneSecond / World.FPS;
@@ -29,16 +27,11 @@ public class Player {
 
 	public static int millisecondsBetweenTicks = World.millisecondsBetweenTicks;
 	public double degreeBetweenRays = World.pov * 1.0 / World.width_resolution;
-	
-	public Player(){
-		this(null);
-	}
-	
-	public Player(Map map){
-		initTimers();
+
+	public Player(Map map) {
 		this.map = map;
 	}
-	
+
 	public void setPoint(Point2D point) {
 		x = point.getX();
 		y = point.getY();
@@ -51,15 +44,15 @@ public class Player {
 	public Direction getLookingDirection() {
 		return lookingDirection;
 	}
-	
-	public void setLookingDirectionZAxis(Direction lookingDirection) {
-		this.lookingDirectionZAxis = lookingDirection;
+
+	public void setLookingDirectionZAxis(double newValue) {
+		this.lookingDirectionZAxis = newValue;
 	}
 
-	public Direction getLookingDirectionZAxis() {
+	public double getLookingDirectionZAxis() {
 		return lookingDirectionZAxis;
 	}
-	
+
 	public Point2D getPoint() {
 		return new Point2D.Double(x, y);
 	}
@@ -71,15 +64,15 @@ public class Player {
 		double changeInY = movementInOneTick * Math.sin(Math.toRadians(direction.getDirectionNumber()));
 		int signOfChangeInY = (int) Math.signum(changeInY);
 		double minDistanceFromWallInY = MIN_DISTANCE_FROM_WALL * signOfChangeInY;
-		
+
 		Point2D newXPos = new Point2D.Double(x + changeInX + minDistanceFromWallInX, y);
 		Point2D newYPos = new Point2D.Double(x, y + changeInY + minDistanceFromWallInY);
-		
-//		if(!map.canMove(getPoint(), newXPos))
-//			changeInX = 0;
-//		if(!map.canMove(getPoint(), newYPos))
-//			changeInY = 0;
-		
+
+		if (!map.canMove(getPoint(), newXPos))
+			changeInX = 0;
+		if (!map.canMove(getPoint(), newYPos))
+			changeInY = 0;
+
 		x += changeInX;
 		y += changeInY;
 	}
@@ -112,109 +105,26 @@ public class Player {
 		getLookingDirection().addDirection(-1 * rotationInOneTick);
 	}
 
-	private Timer repeatMovingForward;
-	private Timer repeatMovingBackward;
-	private Timer repeatMovingLeft;
-	private Timer repeatMovingRight;
-	private Timer repeatRotatingLeft;
-	private Timer repeatRotatingRight;
+	public void updatePlayer(KeyboardInput KB) {
 
-	private void initTimers() {
-		repeatMovingForward = new Timer(millisecondsBetweenTicks, new ActionListener() {
-			@Override
-			public void actionPerformed(ActionEvent event) {
-				moveOneFrameForward();
-			}
-		});
-		repeatMovingForward.setInitialDelay(0);
-		
-		repeatMovingBackward = new Timer(millisecondsBetweenTicks, new ActionListener() {
-			@Override
-			public void actionPerformed(ActionEvent event) {
-				moveOneFrameBackward();
-			}
-		});
-		repeatMovingBackward.setInitialDelay(0);
-		
-		repeatMovingLeft = new Timer(millisecondsBetweenTicks, new ActionListener() {
-			@Override
-			public void actionPerformed(ActionEvent event) {
-				moveOneFrameLeft();
-			}
-		});
-		repeatMovingLeft.setInitialDelay(0);
-		
-		repeatMovingRight = new Timer(millisecondsBetweenTicks, new ActionListener() {
-			@Override
-			public void actionPerformed(ActionEvent event) {
-				moveOneFrameRight();
-			}
-		});
-		repeatMovingRight.setInitialDelay(0);
-		
-		repeatRotatingLeft = new Timer(millisecondsBetweenTicks, new ActionListener() {
-			@Override
-			public void actionPerformed(ActionEvent event) {
-				rotateOneFrameLeft();
-			}
-		});
-		repeatRotatingLeft.setInitialDelay(0);
-		
-		repeatRotatingRight = new Timer(millisecondsBetweenTicks, new ActionListener() {
-			@Override
-			public void actionPerformed(ActionEvent event) {
-				rotateOneFrameRight();
-			}
-		});
-		repeatRotatingRight.setInitialDelay(0);
-		
+		if (KB.keyDown(KeyEvent.VK_W))
+			moveOneFrameForward();
+		if (KB.keyDown(KeyEvent.VK_A))
+			moveOneFrameLeft();
+		if (KB.keyDown(KeyEvent.VK_S))
+			moveOneFrameBackward();
+		if (KB.keyDown(KeyEvent.VK_D))
+			moveOneFrameRight();
+		if (KB.keyDown(KeyEvent.VK_RIGHT))
+			rotateOneFrameRight();
+		if (KB.keyDown(KeyEvent.VK_LEFT))
+			rotateOneFrameLeft();
+		if (KB.keyDown(KeyEvent.VK_UP))
+			if (lookingDirectionZAxis < 300)
+				lookingDirectionZAxis += 10;
+		if (KB.keyDown(KeyEvent.VK_DOWN))
+			if (lookingDirectionZAxis > -300)
+				lookingDirectionZAxis += -10;
 	}
 
-	public void startMovingForward() {
-		repeatMovingForward.start();
-	}
-
-	public void startMovingBackward() {
-		repeatMovingBackward.start();
-	}
-
-	public void startMovingRight() {
-		repeatMovingRight.start();
-	}
-
-	public void startMovingLeft() {
-		repeatMovingLeft.start();
-	}
-
-	public void startRotatingLeft() {
-		repeatRotatingLeft.start();
-	}
-
-	public void startRotatingRight() {
-		repeatRotatingRight.start();
-	}
-
-	public void stopMovingForward() {
-		repeatMovingForward.stop();
-	}
-
-	public void stopMovingBackward() {
-		repeatMovingBackward.stop();
-	}
-
-	public void stopMovingRight() {
-		repeatMovingRight.stop();
-	}
-
-	public void stopMovingLeft() {
-		repeatMovingLeft.stop();
-	}
-
-	public void stopRotatinggLeft() {
-		repeatRotatingLeft.stop();
-	}
-
-	public void stopRotatingRight() {
-		repeatRotatingRight.stop();
-	}
 }

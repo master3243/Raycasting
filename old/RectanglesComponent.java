@@ -120,9 +120,8 @@ public class RectanglesComponent extends JComponent {
 		if(keyboard.keyDown(KeyEvent.VK_DOWN))
 			if(constantOfY > -300)
 				constantOfY -= 10;
-		
-		
 	}
+	
 	static double constantOfY = 0;
 	public void drawWalls() {
 		comp.clearRectangle();

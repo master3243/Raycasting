@@ -5,11 +5,8 @@
 package raycasting.gui;
 
 import java.awt.Color;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
+import java.awt.event.KeyEvent;
 import java.util.ArrayList;
-
-import javax.swing.Timer;
 
 import raycasting.WallProperties;
 import raycasting.World;
@@ -21,34 +18,42 @@ public class DataToGUI {
 	private GUI gui;
 	private Map map;
 	private Player player;
-	private Timer guiUpdater;
+	
+	private static final Color skyColor = new Color(0, 255, 255);
+	private static final Color groundColor = new Color(130, 90, 44);
 	
 	public DataToGUI(GUI gui, Map map, Player player){
 		this.gui = gui;
 		this.map = map;
 		this.player = player;
-		
-		guiUpdater = new Timer(World.millisecondsBetweenTicks, new ActionListener() {
-			@Override
-			public void actionPerformed(ActionEvent event) {
-				updateGUI();
-			}
-		});
-		guiUpdater.setInitialDelay(0);
 	}
 	
 	public void startUpdatingGUI(){
-		guiUpdater.start();
+		while(true){
+			try {
+				Thread.sleep(World.millisecondsBetweenTicks);
+			} catch (InterruptedException e) {
+				e.printStackTrace();
+			}
+			keyboard_check();
+			updateGUI();
+		}
 	}
 	
-	public void stopUpdatingGUI(){
-		guiUpdater.stop();
+	void keyboard_check(){
+		gui.keyboard.poll();
+		player.updatePlayer(gui.keyboard);
 	}
 	
 	private void updateGUI(){
 		gui.clearRectangles();
+		
+		Rectangle[] background = getBackground();
+		gui.addRectangles(background);
+		
 		ArrayList<Rectangle> walls = wallPropertiesToRectangles(map, player);
 		gui.addRectangles(walls);
+		
 		gui.repaint();
 	}
 	
@@ -58,7 +63,7 @@ public class DataToGUI {
 		
 		int numOfRetangles = wallProp.length; //World.width_resolution
 		double widthOfRectangle = (double) gui.widthOfWindow / numOfRetangles;
-		double heightOfEyeLevel = player.getLookingDirectionZAxis().getDirectionNumber();
+		double heightOfEyeLevel = player.getLookingDirectionZAxis();
 		
 		for(int i = 0; i < wallProp.length; i++){
 			if (wallProp[i] == null){
@@ -71,6 +76,19 @@ public class DataToGUI {
 			
 			result.add(new Rectangle(x, y, widthOfRectangle, height, color));
 		}
+		return result;
+	}
+	
+	private Rectangle[] getBackground(){
+		Rectangle[] result = new Rectangle[2];
+		double middleOfLookingDirectionZAxis = gui.heightOfWindow / 2 + player.getLookingDirectionZAxis();
+		
+		Rectangle sky = new Rectangle(0, 0, gui.widthOfWindow, middleOfLookingDirectionZAxis, skyColor);
+		Rectangle ground = new Rectangle(0, middleOfLookingDirectionZAxis
+				, gui.widthOfWindow, gui.heightOfWindow, groundColor);
+
+		result[0] = sky;
+		result[1] = ground;
 		
 		return result;
 	}

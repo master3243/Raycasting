@@ -12,13 +12,8 @@ import java.awt.Graphics2D;
 import java.awt.geom.Rectangle2D;
 import java.util.ArrayList;
 
-import javax.swing.JButton;
 import javax.swing.JComponent;
 import javax.swing.JFrame;
-import javax.swing.JPanel;
-
-import raycasting.keyboard.ComponentKeyboardMapEditor;
-import raycasting.keyboard.KeyboardBindings;
 import raycasting.keyboard.KeyboardInput;
 
 @SuppressWarnings("serial")
@@ -28,6 +23,7 @@ public class GUI  extends JComponent {
 
 	public final int widthOfWindow;
 	public final int heightOfWindow;
+	public KeyboardInput keyboard;
 	
 	public GUI(int widthOfWindow, int heightOfWindow) {
 		frame = new JFrame();
@@ -38,20 +34,13 @@ public class GUI  extends JComponent {
 		setPreferredSize(new Dimension(widthOfWindow, heightOfWindow));
 		frame.getContentPane().add(this, BorderLayout.CENTER);
 		
-		//keyboardinput old version test
-		KeyboardInput keyboard = new KeyboardInput();
-		JPanel buttonsPanel = new JPanel();
-		JButton clearButton = new JButton();
-		clearButton.addKeyListener(keyboard);
-		buttonsPanel.add(clearButton);
-		frame.getContentPane().add(buttonsPanel, BorderLayout.SOUTH);
+		keyboard = new KeyboardInput();
+		frame.addKeyListener(keyboard);
+		frame.setFocusable(true);
+		frame.requestFocusInWindow();
 		
 		frame.pack();
 		frame.setVisible(true);
-	}
-	
-	public ComponentKeyboardMapEditor getComponentMapEditor(){
-		return new ComponentKeyboardMapEditor(this);
 	}
 	
 	@Override
@@ -84,6 +73,11 @@ public class GUI  extends JComponent {
 	}
 	
 	public void addRectangles(ArrayList<Rectangle> arr){
+		for(Rectangle rec : arr)
+			rectangles.add(rec);
+	}
+	
+	public void addRectangles(Rectangle[] arr){
 		for(Rectangle rec : arr)
 			rectangles.add(rec);
 	}
