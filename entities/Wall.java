@@ -11,6 +11,7 @@ public class Wall {
 	
 	private Line2D line; 
 	private Color color;
+	public boolean isWalkable = false;
 	
 	public Wall(double x1, double y1, double x2, double y2){
 		this(x1, y1, x2, y2, new Color(0, 0, 0));

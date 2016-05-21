@@ -14,16 +14,14 @@ import java.util.ArrayList;
 
 import javax.swing.JComponent;
 import javax.swing.JFrame;
-import raycasting.keyboard.KeyboardInput;
 
 @SuppressWarnings("serial")
 public class GUI  extends JComponent {
 	
-	private final JFrame frame;
+	public final JFrame frame;
 
 	public final int widthOfWindow;
 	public final int heightOfWindow;
-	public KeyboardInput keyboard;
 	
 	public GUI(int widthOfWindow, int heightOfWindow) {
 		frame = new JFrame();
@@ -33,11 +31,6 @@ public class GUI  extends JComponent {
 		frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 		setPreferredSize(new Dimension(widthOfWindow, heightOfWindow));
 		frame.getContentPane().add(this, BorderLayout.CENTER);
-		
-		keyboard = new KeyboardInput();
-		frame.addKeyListener(keyboard);
-		frame.setFocusable(true);
-		frame.requestFocusInWindow();
 		
 		frame.pack();
 		frame.setVisible(true);

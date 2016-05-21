@@ -4,12 +4,12 @@
  */
 package raycasting.entities;
 
-import java.awt.event.KeyEvent;
 import java.awt.geom.Point2D;
+
 import raycasting.Direction;
+import raycasting.World;
 import raycasting.keyboard.KeyboardInput;
 import raycasting.map.Map;
-import raycasting.old.World;
 
 public class Player {
 
@@ -19,7 +19,8 @@ public class Player {
 	private double lookingDirectionZAxis = 0;
 	private Map map;
 	private double MIN_DISTANCE_FROM_WALL = 2;
-
+	private int[] controls;
+	
 	private double movementInOneSecond = 20;
 	private double rotationInOneSecond = 180;
 	private double movementInOneTick = movementInOneSecond / World.FPS;
@@ -27,9 +28,12 @@ public class Player {
 
 	public static int millisecondsBetweenTicks = World.millisecondsBetweenTicks;
 	public double degreeBetweenRays = World.pov * 1.0 / World.width_resolution;
-
-	public Player(Map map) {
+	public int playerNumber;
+	
+	public Player(Map map, int num, int[] controls) {
 		this.map = map;
+		playerNumber = num;
+		this.controls = controls;
 	}
 
 	public void setPoint(Point2D point) {
@@ -107,22 +111,22 @@ public class Player {
 
 	public void updatePlayer(KeyboardInput KB) {
 
-		if (KB.keyDown(KeyEvent.VK_W))
+		if (KB.keyDown(controls[0]))
 			moveOneFrameForward();
-		if (KB.keyDown(KeyEvent.VK_A))
+		if (KB.keyDown(controls[1]))
 			moveOneFrameLeft();
-		if (KB.keyDown(KeyEvent.VK_S))
+		if (KB.keyDown(controls[2]))
 			moveOneFrameBackward();
-		if (KB.keyDown(KeyEvent.VK_D))
+		if (KB.keyDown(controls[3]))
 			moveOneFrameRight();
-		if (KB.keyDown(KeyEvent.VK_RIGHT))
+		if (KB.keyDown(controls[4]))
 			rotateOneFrameRight();
-		if (KB.keyDown(KeyEvent.VK_LEFT))
+		if (KB.keyDown(controls[5]))
 			rotateOneFrameLeft();
-		if (KB.keyDown(KeyEvent.VK_UP))
+		if (KB.keyDown(controls[6]))
 			if (lookingDirectionZAxis < 300)
 				lookingDirectionZAxis += 10;
-		if (KB.keyDown(KeyEvent.VK_DOWN))
+		if (KB.keyDown(controls[7]))
 			if (lookingDirectionZAxis > -300)
 				lookingDirectionZAxis += -10;
 	}

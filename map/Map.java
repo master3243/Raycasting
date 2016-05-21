@@ -33,10 +33,20 @@ public class Map {
 		}
 	}
 	
-	public ArrayList<Wall> walls = new ArrayList<>();
+	public ArrayList<Wall> physicalWalls = new ArrayList<>();
+	public ArrayList<Wall> playerWalls = new ArrayList<>();
+	
+	public ArrayList<Wall> getWalls(){
+		ArrayList<Wall> result = new ArrayList<Wall>();
+		for(Wall wall : physicalWalls)
+			result.add(wall);
+		for(Wall wall : playerWalls)
+			result.add(wall);
+		return result;
+	}
 	
 	public WallProperties[] generateWallPropertiesArray(Player player) {
-
+		
 		WallProperties[] result = new WallProperties[World.width_resolution];
 		double degreeBetweenRays = player.degreeBetweenRays;
 		double playerDirection = player.getLookingDirection().getDirectionNumber();
@@ -80,7 +90,7 @@ public class Map {
 
 	public ArrayList<Wall> getCollidingWalls(Line2D rayLine) {
 		ArrayList<Wall> result = new ArrayList<Wall>();
-		for (Wall wall : walls) {
+		for (Wall wall : getWalls()) {
 			if (wall.intersectsLine(rayLine))
 				result.add(wall);
 		}
@@ -88,9 +98,10 @@ public class Map {
 	}
 	
 	public boolean collidesWithWall (Line2D line){
-		for (Wall wall : walls) {
+		for (Wall wall : getWalls()) {
 			if (wall.intersectsLine(line))
-				return true;
+				if(!wall.isWalkable)
+					return true;
 		}
 		return false;
 	}
