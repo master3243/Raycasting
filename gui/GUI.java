@@ -11,24 +11,40 @@ import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.geom.Rectangle2D;
 import java.util.ArrayList;
+
+import javax.swing.JButton;
 import javax.swing.JComponent;
 import javax.swing.JFrame;
-import javax.swing.KeyStroke;
+import javax.swing.JPanel;
 
 import raycasting.keyboard.ComponentKeyboardMapEditor;
-import raycasting.old.Direction;
-import raycasting.old.Player;
+import raycasting.keyboard.KeyboardBindings;
+import raycasting.keyboard.KeyboardInput;
 
 @SuppressWarnings("serial")
 public class GUI  extends JComponent {
 	
-	private JFrame frame;
+	private final JFrame frame;
 
-	public void initUI(int widthOfWindow, int heightOfWindow) {
+	public final int widthOfWindow;
+	public final int heightOfWindow;
+	
+	public GUI(int widthOfWindow, int heightOfWindow) {
 		frame = new JFrame();
+		this.widthOfWindow = widthOfWindow;
+		this.heightOfWindow = heightOfWindow;
+		
 		frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 		setPreferredSize(new Dimension(widthOfWindow, heightOfWindow));
 		frame.getContentPane().add(this, BorderLayout.CENTER);
+		
+		//keyboardinput old version test
+		KeyboardInput keyboard = new KeyboardInput();
+		JPanel buttonsPanel = new JPanel();
+		JButton clearButton = new JButton();
+		clearButton.addKeyListener(keyboard);
+		buttonsPanel.add(clearButton);
+		frame.getContentPane().add(buttonsPanel, BorderLayout.SOUTH);
 		
 		frame.pack();
 		frame.setVisible(true);
@@ -48,15 +64,18 @@ public class GUI  extends JComponent {
 	
 	public void drawRectangles(Graphics g){
 		for (int i = 0; i < rectangles.size(); i++) {
+
 			Color color = new Color(rectangles.get(i).color.getRGB());
-//			g.setColor(color);
 			double x = rectangles.get(i).x;
-//			int x = rectangles.get(i).x;
 			double y = rectangles.get(i).y;
 			double width = rectangles.get(i).width;
 			double height = rectangles.get(i).height;
+			
+			Rectangle2D rect = new Rectangle2D.Double(x, y, width, height);
+			Graphics2D g2 = (Graphics2D) g;
+			g2.setPaint(color);
+			g2.fill(rect);
 
-//			g.fillRect(x, y, width, height);
 		}
 	}
 
@@ -64,43 +83,13 @@ public class GUI  extends JComponent {
 		rectangles.add(rec);
 	}
 	
-	public void addRectangles(Rectangle[] arr){
+	public void addRectangles(ArrayList<Rectangle> arr){
 		for(Rectangle rec : arr)
 			rectangles.add(rec);
 	}
 	
 	public void clearRectangles(){
 		rectangles.clear();
-	}
-	
-	public static void main(String args[]){
-		GUI gui = new GUI();
-		Player player = new Player();
-		gui.initUI(100, 120);
-		ComponentKeyboardMapEditor keyboard = gui.getComponentMapEditor();
-		keyboard.bindToMoveInDirection(player, KeyStroke.getKeyStroke("W"), new Direction(0));
-		gui.addRectangles(new Rectangle(0, 0, 2, 2, new Color(10, 10, 10)));
-		gui.repaint();
-		java.util.Scanner sc = new java.util.Scanner(System.in);
-		while(true){
-			sc.nextLine();
-			System.out.println(player.getPoint().getX());
-			System.out.println(player.getPoint().getY());
-			
-		}
-		
-		
-		
-		
-		
-		
-		
-		
-		
-		
-		
-		
-		
 	}
 	
 }

@@ -78,19 +78,11 @@ public class RectanglesComponent extends JComponent {
 		comp.setPreferredSize(new Dimension(widthOfWindow, heightOfWindow));
 		testFrame.getContentPane().add(comp, BorderLayout.CENTER);
 		JPanel buttonsPanel = new JPanel();
-		JButton clearButton = new JButton("Turn 20 degrees");
+		JButton clearButton = new JButton();
 		clearButton.addKeyListener(keyboard);
 		buttonsPanel.add(clearButton);
 		testFrame.getContentPane().add(buttonsPanel, BorderLayout.SOUTH);
 		
-		clearButton.addActionListener(new ActionListener() {
-
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				player.getLookingDirection().addDirection(new Direction(20));
-				
-			}
-		});
 		testFrame.pack();
 		testFrame.setVisible(true);
 	}

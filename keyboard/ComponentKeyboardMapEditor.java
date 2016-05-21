@@ -11,8 +11,8 @@ import javax.swing.Action;
 import javax.swing.JComponent;
 import javax.swing.KeyStroke;
 
-import raycasting.old.Direction;
-import raycasting.old.Player;
+import raycasting.Direction;
+import raycasting.entities.Player;;
 
 public class ComponentKeyboardMapEditor {
 

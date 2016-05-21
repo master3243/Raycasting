@@ -2,7 +2,7 @@
  * Abdulrahman Alabdulkareem 782435
  * May 15, 2016
  */
-package raycasting.old;
+package raycasting;
 
 public class World {
 	

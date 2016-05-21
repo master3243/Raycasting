@@ -7,8 +7,21 @@ package raycasting;
 import java.awt.geom.Line2D;
 import java.awt.geom.Point2D;
 
+import raycasting.entities.Wall;
+
 public class Util {
 
+	public static double getDistance(Line2D rayLine, Wall wall){
+		Point2D intersection = getLineLineIntersection(wall.getLine(), rayLine);
+		
+		//TODO might not be useful, remove if so
+		if(intersection == null)
+			return World.draw_distance; // distance is set to be draw_distance units far -> wall not drawn
+		
+		double distance = rayLine.getP1().distance(intersection);
+		return distance;
+	}
+	
 	// from http://www.java-gaming.org/index.php?topic=22590.0
 	public static Point2D getLineLineIntersection(Line2D a, Line2D b) {
 
@@ -38,7 +51,8 @@ public class Util {
 		double y = (det(det1And2, y1LessY2, det3And4, y3LessY4) / det1Less2And3Less4);
 		return new Point2D.Double(x, y);
 	}
-
+	
+	// from http://www.java-gaming.org/index.php?topic=22590.0
 	private static double det(double a, double b, double c, double d) {
 		return a * d - b * c;
 	}

@@ -5,6 +5,10 @@
 package raycasting.old;
 
 import java.util.ArrayList;
+
+import raycasting.World;
+import raycasting.entities.Wall;
+
 import java.awt.Color;
 import java.awt.geom.Line2D;
 import java.awt.geom.Point2D;
@@ -73,27 +77,6 @@ public class Map {
 		walls.add(new Wall(x2, y2, x1, y2, color));
 		walls.add(new Wall(x1, y2, x1, y1, color.darker()));
 	}
-
-	public double[] generateDistanceArray(Player player) {
-
-		double[] result = new double[World.width_resolution];
-		double fraction = World.pov * 1.0 / World.width_resolution;
-		double playerDirection = player.getLookingDirection().getDirectionNumber();
-		Point2D playerPosition = player.getPoint();
-		double rightMostPixel = playerDirection - (World.pov / 2);
-
-		for (int i = 0; i < World.width_resolution; i++) {
-			Direction rayDirection = new Direction(rightMostPixel + (fraction * i));
-			Line2D rayLine = new Line2D.Double(playerPosition.getX(), playerPosition.getY(),
-					playerPosition.getX() + World.draw_distance * Math.cos(Math.toRadians(rayDirection.getDirectionNumber())),
-					playerPosition.getY() + World.draw_distance * Math.sin(Math.toRadians(rayDirection.getDirectionNumber())));
-			Wall closestWall = nearestWall(rayLine);
-			if(closestWall == null)
-				continue;
-			result[i] = getDistance(rayLine, closestWall);	
-		}
-		return result;
-	}
 	
 	public WallProperties[] generateWallPropertiesArray(Player player) {
 
@@ -105,9 +88,14 @@ public class Map {
 
 		for (int i = 0; i < World.width_resolution; i++) {
 			Direction rayDirection = new Direction(rightMostPixel + (fraction * i));
-			Line2D rayLine = new Line2D.Double(playerPosition.getX(), playerPosition.getY(),
-					playerPosition.getX() + World.draw_distance * Math.cos(Math.toRadians(rayDirection.getDirectionNumber())),
-					playerPosition.getY() + World.draw_distance * Math.sin(Math.toRadians(rayDirection.getDirectionNumber())));
+
+			double endXAxisOfRay = playerPosition.getX() + 
+					World.draw_distance * Math.cos(Math.toRadians(rayDirection.getDirectionNumber()));
+			double endYAxisOfRay = playerPosition.getY() + 
+					World.draw_distance * Math.sin(Math.toRadians(rayDirection.getDirectionNumber()));
+			Point2D endPointOfRay = new Point2D.Double(endXAxisOfRay, endYAxisOfRay);
+			Line2D rayLine = new Line2D.Double(playerPosition, endPointOfRay);
+			
 			Wall closestWall = nearestWall(rayLine);
 			if(closestWall == null)	
 				continue;
