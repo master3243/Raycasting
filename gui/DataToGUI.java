@@ -23,7 +23,6 @@ public class DataToGUI {
 	private static final Color skyColor = new Color(0, 255, 255);
 	private static final Color groundColor = new Color(130, 90, 44);
 	private static final double lengthOfOtherPlayerWalls = 3;
-	private static final Color colorOfOtherPlayerWalls = new Color(255, 215, 0);
 	
 	
 	public DataToGUI(GUI gui, Map map, Player player) {
@@ -59,17 +58,17 @@ public class DataToGUI {
 		map.playerWalls.clear();
 		Player otherPlayer = Main.getPlayers()[playrNum];
 		Point2D loc = otherPlayer.getPoint();
-		
+		Color otherColor = otherPlayer.playerColor;
 		
 		double xStart = loc.getX() - lengthOfOtherPlayerWalls;
 		double xEnd = loc.getX() + lengthOfOtherPlayerWalls;
 		double yStart = loc.getY() - lengthOfOtherPlayerWalls;
 		double yEnd = loc.getY() + lengthOfOtherPlayerWalls;
 		
-		map.playerWalls.add(new Wall(xStart, yStart, xEnd, yStart, colorOfOtherPlayerWalls));
-		map.playerWalls.add(new Wall(xEnd, yStart, xEnd, yEnd, colorOfOtherPlayerWalls.darker()));
-		map.playerWalls.add(new Wall(xEnd, yEnd, xStart, yEnd, colorOfOtherPlayerWalls));
-		map.playerWalls.add(new Wall(xStart, yEnd, xStart, yStart, colorOfOtherPlayerWalls.darker()));
+		map.playerWalls.add(new Wall(xStart, yStart, xEnd, yStart, otherColor ));
+		map.playerWalls.add(new Wall(xEnd, yStart, xEnd, yEnd, otherColor .darker()));
+		map.playerWalls.add(new Wall(xEnd, yEnd, xStart, yEnd, otherColor ));
+		map.playerWalls.add(new Wall(xStart, yEnd, xStart, yStart, otherColor .darker()));
 	}
 
 	private ArrayList<Rectangle> wallPropertiesToRectangles(Map map, Player player) {

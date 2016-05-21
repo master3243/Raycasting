@@ -4,6 +4,7 @@
  */
 package raycasting.entities;
 
+import java.awt.Color;
 import java.awt.geom.Point2D;
 
 import raycasting.Direction;
@@ -18,22 +19,36 @@ public class Player {
 	private Direction lookingDirection = new Direction(0);
 	private double lookingDirectionZAxis = 0;
 	private Map map;
-	private double MIN_DISTANCE_FROM_WALL = 2;
 	private int[] controls;
+	private double staminaPercentage = 100;
+	private boolean isRunning = false;
+	public int pov = originalPOV;
 	
 	private double movementInOneSecond = 20;
 	private double rotationInOneSecond = 180;
 	private double movementInOneTick = movementInOneSecond / World.FPS;
 	private double rotationInOneTick = rotationInOneSecond / World.FPS;
-
-	public static int millisecondsBetweenTicks = World.millisecondsBetweenTicks;
-	public double degreeBetweenRays = World.pov * 1.0 / World.width_resolution;
-	public int playerNumber;
 	
-	public Player(Map map, int num, int[] controls) {
+	private double MIN_DISTANCE_FROM_WALL = 2;
+	
+	private double staminaDurationInSeconds = 5;
+	private double staminaDurationInTicks = staminaDurationInSeconds * World.FPS;
+	private double runningDistanceMultiplier = 2;
+	private double runningDistanceInOneSecond = runningDistanceMultiplier * movementInOneSecond;
+	private double runningDistanceInOneTick = runningDistanceInOneSecond / World.FPS;
+//	private double cooldownDurationInSeconds = 1;
+	
+	public static final int originalPOV = 120;
+	public static int millisecondsBetweenTicks = World.millisecondsBetweenTicks;
+	public double degreeBetweenRays = pov * 1.0 / World.width_resolution;
+	public int playerNumber;
+	public Color playerColor;
+	
+	public Player(Map map, int num, Color playerColor, int[] controls) {
 		this.map = map;
 		playerNumber = num;
 		this.controls = controls;
+		this.playerColor = playerColor;
 	}
 
 	public void setPoint(Point2D point) {
@@ -60,12 +75,20 @@ public class Player {
 	public Point2D getPoint() {
 		return new Point2D.Double(x, y);
 	}
+	
+	public double getMovementInOneTick(){
+		if(isRunning)
+			return runningDistanceInOneTick;
+		else
+			return movementInOneTick;
+	}
 
 	public void moveOneFrame(Direction direction) {
-		double changeInX = movementInOneTick * Math.cos(Math.toRadians(direction.getDirectionNumber()));
+		double changeInX = getMovementInOneTick() * Math.cos(Math.toRadians(direction.getDirectionNumber()));
 		int signOfChangeInX = (int) Math.signum(changeInX);
 		double minDistanceFromWallInX = MIN_DISTANCE_FROM_WALL * signOfChangeInX;
-		double changeInY = movementInOneTick * Math.sin(Math.toRadians(direction.getDirectionNumber()));
+		
+		double changeInY = getMovementInOneTick() * Math.sin(Math.toRadians(direction.getDirectionNumber()));
 		int signOfChangeInY = (int) Math.signum(changeInY);
 		double minDistanceFromWallInY = MIN_DISTANCE_FROM_WALL * signOfChangeInY;
 
@@ -108,9 +131,37 @@ public class Player {
 	public void rotateOneFrameRight() {
 		getLookingDirection().addDirection(-1 * rotationInOneTick);
 	}
+	
+	private void staminaUpdate(boolean buttonActive){
+		pov = originalPOV;
+		if(buttonActive && staminaPercentage > 0){
+			isRunning = true;
+			decreaseStamina();
+			pov += 20;
+		} else{
+			increaseStamina();
+			isRunning = false;
+		}
+	}
+	
+	private void increaseStamina(){
+		staminaPercentage += 100 / staminaDurationInTicks;
+		if(staminaPercentage > 100)
+			staminaPercentage = 100;
+	}
+	
+	private void decreaseStamina(){
+		staminaPercentage -= 100 / staminaDurationInTicks;
+		if(staminaPercentage < 0)
+			staminaPercentage = 0;
+	}
 
 	public void updatePlayer(KeyboardInput KB) {
-
+		if(KB.keyDown(controls[8]))
+			staminaUpdate(true);
+		else
+			staminaUpdate(false);
+		
 		if (KB.keyDown(controls[0]))
 			moveOneFrameForward();
 		if (KB.keyDown(controls[1]))
@@ -124,10 +175,10 @@ public class Player {
 		if (KB.keyDown(controls[5]))
 			rotateOneFrameLeft();
 		if (KB.keyDown(controls[6]))
-			if (lookingDirectionZAxis < 300)
+			if (lookingDirectionZAxis < 400)
 				lookingDirectionZAxis += 10;
 		if (KB.keyDown(controls[7]))
-			if (lookingDirectionZAxis > -300)
+			if (lookingDirectionZAxis > -350)
 				lookingDirectionZAxis += -10;
 	}
 

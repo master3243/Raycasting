@@ -51,7 +51,7 @@ public class Map {
 		double degreeBetweenRays = player.degreeBetweenRays;
 		double playerDirection = player.getLookingDirection().getDirectionNumber();
 		Point2D playerPosition = player.getPoint();
-		double rightMostPixel = playerDirection - (World.pov / 2);
+		double rightMostPixel = playerDirection - (player.pov / 2);
 
 		for (int i = 0; i < World.width_resolution; i++) {
 			Direction rayDirection = new Direction(rightMostPixel + (degreeBetweenRays * i));
