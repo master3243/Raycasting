@@ -6,6 +6,7 @@ package raycasting.entities;
 
 import java.awt.Color;
 import java.awt.geom.Point2D;
+import java.util.ArrayList;
 
 import raycasting.Direction;
 import raycasting.World;
@@ -13,43 +14,48 @@ import raycasting.keyboard.KeyboardInput;
 import raycasting.map.Map;
 
 public class Player {
-
+	
+	public static final int millisecondsBetweenTicks = World.millisecondsBetweenTicks;
+	public static final ArrayList<Player> players = new ArrayList<>();
+	private static int playerCount = 1;
+	
+	public final Map map;
+	public final int[] controls;
+	public final int playerNumber;
+	public final Color playerColor;
+	public final double movementPerSecond = 20;
+	public final double rotationPerSecond = 180;
+	public final double zAxisMaxRotation = 400;
+	public final double zAxisrotationPerSecond = 600;
+	public final double minDistanceFromWall = 2;
+	public final double lengthOfPlayerWalls = 3;
+	public final int originalPOV = 120;
+	public final double staminaDurationInSeconds = 5;
+	public final double runningDistanceMultiplier = 2;
+	public final double runningDistancePerSecond = runningDistanceMultiplier * movementPerSecond;
+//	public double cooldownDurationInSeconds = 1;
+	
+	private final double movementPerTick = movementPerSecond / World.FPS;
+	private final double rotationPerTick = rotationPerSecond / World.FPS;
+	private final double zAxisRotationPerTick = zAxisrotationPerSecond / World.FPS;
+	private final double staminaDurationInTicks = staminaDurationInSeconds * World.FPS;
+	private final double runningDistancePerTick = runningDistancePerSecond / World.FPS;
+	
 	private double x = 0;
 	private double y = 0;
 	private Direction lookingDirection = new Direction(0);
 	private double lookingDirectionZAxis = 0;
-	private Map map;
-	private int[] controls;
 	private double staminaPercentage = 100;
 	private boolean isRunning = false;
-	public int pov = originalPOV;
+	private int pov = originalPOV;
 	
-	
-	private double movementInOneSecond = 20;
-	private double rotationInOneSecond = 180;
-	private double movementInOneTick = movementInOneSecond / World.FPS;
-	private double rotationInOneTick = rotationInOneSecond / World.FPS;
-	
-	private double MIN_DISTANCE_FROM_WALL = 2;
-	
-	private double staminaDurationInSeconds = 5;
-	private double staminaDurationInTicks = staminaDurationInSeconds * World.FPS;
-	private double runningDistanceMultiplier = 2;
-	private double runningDistanceInOneSecond = runningDistanceMultiplier * movementInOneSecond;
-	private double runningDistanceInOneTick = runningDistanceInOneSecond / World.FPS;
-//	private double cooldownDurationInSeconds = 1;
-	
-	
-	public static final int originalPOV = 120;
-	public static final int millisecondsBetweenTicks = World.millisecondsBetweenTicks;
-	public int playerNumber;
-	public Color playerColor;
-	
-	public Player(Map map, int num, Color playerColor, int[] controls) {
+	public Player(Map map, Color playerColor, int[] controls) {
 		this.map = map;
-		playerNumber = num;
 		this.controls = controls;
 		this.playerColor = playerColor;
+		players.add(this);
+		playerNumber = playerCount;
+		playerCount++;
 	}
 
 	public void setPoint(Point2D point) {
@@ -79,23 +85,27 @@ public class Player {
 	
 	public double getMovementInOneTick(){
 		if(isRunning)
-			return runningDistanceInOneTick;
+			return runningDistancePerTick;
 		else
-			return movementInOneTick;
+			return movementPerTick;
 	}
 	
 	public double getDegreeBetweenRays(){
-		return pov * 1.0 / World.width_resolution;
+		return (double) pov / World.width_resolution;
 	}
-
+	
+	public int getFOV(){
+		return pov;
+	}
+	
 	public void moveOneFrame(Direction direction) {
 		double changeInX = getMovementInOneTick() * Math.cos(Math.toRadians(direction.getDirectionNumber()));
 		int signOfChangeInX = (int) Math.signum(changeInX);
-		double minDistanceFromWallInX = MIN_DISTANCE_FROM_WALL * signOfChangeInX;
+		double minDistanceFromWallInX = minDistanceFromWall * signOfChangeInX;
 		
 		double changeInY = getMovementInOneTick() * Math.sin(Math.toRadians(direction.getDirectionNumber()));
 		int signOfChangeInY = (int) Math.signum(changeInY);
-		double minDistanceFromWallInY = MIN_DISTANCE_FROM_WALL * signOfChangeInY;
+		double minDistanceFromWallInY = minDistanceFromWall * signOfChangeInY;
 
 		Point2D newXPos = new Point2D.Double(x + changeInX + minDistanceFromWallInX, y);
 		Point2D newYPos = new Point2D.Double(x, y + changeInY + minDistanceFromWallInY);
@@ -130,21 +140,21 @@ public class Player {
 	}
 
 	public void rotateOneFrameLeft() {
-		getLookingDirection().addDirection(rotationInOneTick);
+		getLookingDirection().addDirection(rotationPerTick);
 	}
 
 	public void rotateOneFrameRight() {
-		getLookingDirection().addDirection(-1 * rotationInOneTick);
+		getLookingDirection().addDirection(-1 * rotationPerTick);
 	}
 	
 	public void lookUpOneFrame(){
-		if (lookingDirectionZAxis > -350)
-			lookingDirectionZAxis += -10;
+		if (lookingDirectionZAxis > -zAxisMaxRotation)
+			lookingDirectionZAxis += zAxisRotationPerTick;
 	}
 	
 	public void lookDownOneFrame(){
-		if (lookingDirectionZAxis < 400)
-			lookingDirectionZAxis += 10;
+		if (lookingDirectionZAxis < zAxisMaxRotation)
+			lookingDirectionZAxis += -zAxisRotationPerTick;
 	}
 	
 	private void staminaUpdate(boolean buttonActive){
@@ -186,13 +196,14 @@ public class Player {
 		if (KB.keyDown(controls[3]))
 			moveOneFrameRight();
 		if (KB.keyDown(controls[4]))
-			rotateOneFrameRight();
+			lookUpOneFrame();
 		if (KB.keyDown(controls[5]))
 			rotateOneFrameLeft();
 		if (KB.keyDown(controls[6]))
 			lookDownOneFrame();
 		if (KB.keyDown(controls[7]))
-			lookUpOneFrame();
+			rotateOneFrameRight();
+		
 	}
 
 }

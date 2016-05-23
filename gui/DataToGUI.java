@@ -22,9 +22,7 @@ public class DataToGUI {
 
 	private static final Color skyColor = new Color(0, 255, 255);
 	private static final Color groundColor = new Color(130, 90, 44);
-	private static final double lengthOfOtherPlayerWalls = 3;
-	
-	
+
 	public DataToGUI(GUI gui, Map map, Player player) {
 		this.gui = gui;
 		this.map = map;
@@ -43,32 +41,38 @@ public class DataToGUI {
 
 	private void updateGUI() {
 		gui.clearRectangles();
-		updateOtherPlayerLocation((player.playerNumber % 2));
-		
+		updateOtherPlayerLocation();
+
 		Rectangle[] background = getBackground();
 		gui.addRectangles(background);
 
 		ArrayList<Rectangle> walls = wallPropertiesToRectangles(map, player);
 		gui.addRectangles(walls);
-		
+
 		gui.repaint();
 	}
-	
-	private void updateOtherPlayerLocation(int playrNum){
+
+	private void updateOtherPlayerLocation() {
 		map.playerWalls.clear();
-		Player otherPlayer = Main.getPlayers()[playrNum];
-		Point2D loc = otherPlayer.getPoint();
-		Color otherColor = otherPlayer.playerColor;
+		double wallLength = player.lengthOfPlayerWalls;
 		
-		double xStart = loc.getX() - lengthOfOtherPlayerWalls;
-		double xEnd = loc.getX() + lengthOfOtherPlayerWalls;
-		double yStart = loc.getY() - lengthOfOtherPlayerWalls;
-		double yEnd = loc.getY() + lengthOfOtherPlayerWalls;
-		
-		map.playerWalls.add(new Wall(xStart, yStart, xEnd, yStart, otherColor ));
-		map.playerWalls.add(new Wall(xEnd, yStart, xEnd, yEnd, otherColor .darker()));
-		map.playerWalls.add(new Wall(xEnd, yEnd, xStart, yEnd, otherColor ));
-		map.playerWalls.add(new Wall(xStart, yEnd, xStart, yStart, otherColor .darker()));
+		for (int i = 0; i < Player.players.size(); i++) {
+			if(i + 1 == player.playerNumber)
+				continue;
+			Player otherPlayer = Player.players.get(i);
+			Point2D loc = otherPlayer.getPoint();
+			Color otherColor = otherPlayer.playerColor;
+
+			double xStart = loc.getX() - wallLength;
+			double xEnd = loc.getX() + wallLength;
+			double yStart = loc.getY() - wallLength;
+			double yEnd = loc.getY() + wallLength;
+
+			map.playerWalls.add(new Wall(xStart, yStart, xEnd, yStart, otherColor));
+			map.playerWalls.add(new Wall(xEnd, yStart, xEnd, yEnd, otherColor.darker()));
+			map.playerWalls.add(new Wall(xEnd, yEnd, xStart, yEnd, otherColor));
+			map.playerWalls.add(new Wall(xStart, yEnd, xStart, yStart, otherColor.darker()));
+		}
 	}
 
 	private ArrayList<Rectangle> wallPropertiesToRectangles(Map map, Player player) {
@@ -85,8 +89,9 @@ public class DataToGUI {
 			}
 			double x = gui.widthOfWindow - widthOfRectangle * (i + 1);
 			double height = (5000 / wallProperties[i].distance);
-//			double height = (500 - wallProp[i].distance*10); trying out different methods,, not good
-			
+			// double height = (500 - wallProp[i].distance*10); trying out
+			// different methods,, not good
+
 			double y = gui.heightOfWindow / 2 + heightOfEyeLevel - height / 2;
 			Color color = wallProperties[i].color;
 
@@ -98,11 +103,10 @@ public class DataToGUI {
 	private Rectangle[] getBackground() {
 		Rectangle[] result = new Rectangle[2];
 		double middleOfLookingDirectionZAxis = gui.heightOfWindow / 2 + player.getLookingDirectionZAxis();
-		
+
 		Rectangle sky = new Rectangle(0, 0, gui.widthOfWindow, middleOfLookingDirectionZAxis, skyColor);
-		Rectangle ground = new Rectangle(0, middleOfLookingDirectionZAxis, gui.widthOfWindow
-				, gui.heightOfWindow - middleOfLookingDirectionZAxis
-				, groundColor);
+		Rectangle ground = new Rectangle(0, middleOfLookingDirectionZAxis, gui.widthOfWindow,
+				gui.heightOfWindow - middleOfLookingDirectionZAxis, groundColor);
 
 		result[0] = sky;
 		result[1] = ground;

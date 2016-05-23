@@ -59,7 +59,28 @@ public class MapData {
 			{1, 0, 1, 0, 1, 0, 1, 1, 1, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1},
 			{1, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
 			{1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1}};
-		generateMapFromArray(map, arr, color);
+		generateMapFromArray(map, arr, 10, color);
+	}
+	
+	public static void generateMap5(Map map){
+		Color color = new Color(30, 70, 60);
+		int[][] arr = new int[][]{
+			{1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1},
+			{1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1},
+			{1, 0, 1, 0, 1, 1, 1, 1, 1, 1, 1, 0, 1, 1, 1, 1, 1, 1, 1, 0, 1},
+			{1, 2, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 2, 1},
+			{1, 1, 1, 0, 1, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 1, 1, 0, 1, 1, 1},
+			{1, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 1, 2, 0, 0, 1, 0, 0, 0, 1},
+			{1, 0, 1, 1, 1, 0, 1, 1, 1, 1, 1, 0, 1, 1, 1, 0, 1, 1, 1, 0, 1},
+			{1, 0, 1, 0, 0, 0, 0, 0, 0, 2, 1, 0, 1, 0, 0, 0, 1, 0, 0, 0, 1},
+			{1, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 1, 1, 1},
+			{1, 0, 0, 0, 1, 2, 1, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1},
+			{1, 1, 1, 0, 1, 0, 1, 0, 0, 0, 1, 1, 1, 1, 1, 0, 1, 0, 1, 0, 1},
+			{1, 2, 1, 0, 0, 0, 1, 2, 0, 0, 1, 2, 0, 0, 0, 0, 1, 0, 1, 2, 1},
+			{1, 0, 1, 0, 1, 0, 1, 1, 1, 0, 1, 1, 1, 1, 1, 1, 1, 0, 1, 1, 1},
+			{1, 0, 0, 0, 1, 0, 0, 2, 1, 2, 1, 2, 0, 0, 0, 0, 0, 0, 0, 2, 1},
+			{1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1}};
+		generateMapFromArray(map, arr, 10, color);
 	}
 	
 	public static void generateSquare(Map map,double x1, double y1, double x2, double y2, Color color){
@@ -69,28 +90,33 @@ public class MapData {
 		map.physicalWalls.add(new Wall(x1, y2, x1, y1, color.darker()));
 	}
 	
-	public static void generateMapFromArray(Map map, int[][] arr, Color color){
+	public static void generateMapFromArray(Map map, int[][] arr, int wallLength, Color color){
 		for(int r = 0; r < arr.length; r++)
-			for(int c = 0; c < arr[0].length; c++)
+			for(int c = 0; c < arr[0].length; c++){
 				if(arr[r][c] == 1){
-					int x1 = c*10;
-					int y1 = r*10;
-					y1 = -y1;
-					int x2 = c*10 + 10;
-					int y2 = r*10 + 10;
-					y2 = -y2;
+					int x1 = c * wallLength;
+					int y1 = -1 * r * wallLength;
+					int x2 = c * wallLength + wallLength;
+					int y2 = -1 * r * wallLength - wallLength;
 					
-					boolean generateTop = r == 0 || arr[r-1][c] == 0;
-					boolean generateLeft = c == 0 || arr[r][c-1] == 0;
+					boolean generateTop = r != 0 && arr[r-1][c] != 1;
+					boolean generateLeft = c != 0 && arr[r][c-1] != 1;
+					boolean generateDown = r != arr.length - 1 && arr[r+1][c] != 1;
+					boolean generateRight = c != arr[0].length - 1 && arr[r][c+1] != 1;
 					
 					if(generateTop)
 						map.physicalWalls.add(new Wall(x1, y1, x2, y1, color));
-					map.physicalWalls.add(new Wall(x2, y1, x2, y2, color.darker()));
-					map.physicalWalls.add(new Wall(x2, y2, x1, y2, color));
 					if(generateLeft)
 						map.physicalWalls.add(new Wall(x1, y2, x1, y1, color.darker()));
+					if(generateRight)
+						map.physicalWalls.add(new Wall(x2, y1, x2, y2, color.darker()));
+					if(generateDown)
+						map.physicalWalls.add(new Wall(x2, y2, x1, y2, color));
+				}
+				if(arr[r][c] == 2){
 					
 				}
+			}
 	}
 	
 }

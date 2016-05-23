@@ -33,12 +33,15 @@ public class Map {
 		case 4:
 			MapData.generateMap4(this);
 			break;
-		
+		case 5:
+			MapData.generateMap5(this);
+			break;
 		}
 	}
 	
-	public ArrayList<Wall> physicalWalls = new ArrayList<>();
-	public ArrayList<Wall> playerWalls = new ArrayList<>();
+	public final ArrayList<Wall> physicalWalls = new ArrayList<>();
+	public final ArrayList<Wall> playerWalls = new ArrayList<>();
+	public final ArrayList<Point2D> entityLocations = new ArrayList<>();
 	
 	public ArrayList<Wall> getWalls(){
 		ArrayList<Wall> result = new ArrayList<Wall>();
@@ -55,7 +58,7 @@ public class Map {
 		double degreeBetweenRays = player.getDegreeBetweenRays();
 		double playerDirection = player.getLookingDirection().getDirectionNumber();
 		Point2D playerPosition = player.getPoint();
-		double rightMostPixel = playerDirection - (player.pov / 2);
+		double rightMostPixel = playerDirection - (player.getFOV() / 2);
 
 		for (int i = 0; i < World.width_resolution; i++) {
 			Direction rayDirection = new Direction(rightMostPixel + (degreeBetweenRays * i));
