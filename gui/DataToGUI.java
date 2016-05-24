@@ -5,10 +5,10 @@
 package raycasting.gui;
 
 import java.awt.Color;
-import java.awt.geom.Point2D;
 import java.util.ArrayList;
 
 import raycasting.Main;
+import raycasting.Util;
 import raycasting.WallProperties;
 import raycasting.entities.Player;
 import raycasting.entities.Wall;
@@ -54,24 +54,13 @@ public class DataToGUI {
 
 	private void updateOtherPlayerLocation() {
 		map.playerWalls.clear();
-		double wallLength = player.lengthOfPlayerWalls;
-		
+
 		for (int i = 0; i < Player.players.size(); i++) {
 			if(i + 1 == player.playerNumber)
 				continue;
 			Player otherPlayer = Player.players.get(i);
-			Point2D loc = otherPlayer.getPoint();
-			Color otherColor = otherPlayer.playerColor;
-
-			double xStart = loc.getX() - wallLength;
-			double xEnd = loc.getX() + wallLength;
-			double yStart = loc.getY() - wallLength;
-			double yEnd = loc.getY() + wallLength;
-
-			map.playerWalls.add(new Wall(xStart, yStart, xEnd, yStart, otherColor));
-			map.playerWalls.add(new Wall(xEnd, yStart, xEnd, yEnd, otherColor.darker()));
-			map.playerWalls.add(new Wall(xEnd, yEnd, xStart, yEnd, otherColor));
-			map.playerWalls.add(new Wall(xStart, yEnd, xStart, yStart, otherColor.darker()));
+			Wall[] playerWalls = Util.generatePlayerWalls(otherPlayer);
+			map.addPlayerWallArray(playerWalls);
 		}
 	}
 

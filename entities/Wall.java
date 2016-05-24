@@ -6,6 +6,7 @@ package raycasting.entities;
 
 import java.awt.Color;
 import java.awt.geom.Line2D;
+import java.awt.geom.Point2D;
 
 public class Wall {
 	
@@ -13,8 +14,8 @@ public class Wall {
 	private Color color;
 	public boolean isWalkable = false;
 	
-	public Wall(double x1, double y1, double x2, double y2){
-		this(x1, y1, x2, y2, new Color(0, 0, 0));
+	public Wall (Point2D p1, Point2D p2, Color color){
+		this(p1.getX(), p1.getY(), p2.getX(), p2.getY(), color);
 	}
 	
 	public Wall(double x1, double y1, double x2, double y2, Color color){

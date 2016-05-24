@@ -28,7 +28,7 @@ public class Player {
 	public final double zAxisMaxRotation = 400;
 	public final double zAxisrotationPerSecond = 600;
 	public final double minDistanceFromWall = 2;
-	public final double lengthOfPlayerWalls = 3;
+	public final double lengthOfPlayerWall = 3;
 	public final int originalPOV = 120;
 	public final double staminaDurationInSeconds = 5;
 	public final double runningDistanceMultiplier = 2;
@@ -180,6 +180,14 @@ public class Player {
 		if(staminaPercentage < 0)
 			staminaPercentage = 0;
 	}
+	
+	private void shoot(){
+		
+	}
+	
+	public void haveBeenShot(){
+		
+	}
 
 	public void updatePlayer(KeyboardInput KB) {
 		if(KB.keyDown(controls[8]))
@@ -203,6 +211,8 @@ public class Player {
 			lookDownOneFrame();
 		if (KB.keyDown(controls[7]))
 			rotateOneFrameRight();
+		if(KB.keyDown(controls[8]))
+			shoot();
 		
 	}
 

@@ -4,9 +4,11 @@
  */
 package raycasting;
 
+import java.awt.Color;
 import java.awt.geom.Line2D;
 import java.awt.geom.Point2D;
 
+import raycasting.entities.Player;
 import raycasting.entities.Wall;
 
 public class Util {
@@ -20,6 +22,37 @@ public class Util {
 		
 		double distance = rayLine.getP1().distance(intersection);
 		return distance;
+	}
+	
+	private static final double INVRS_SQRT_2 = 0.71;
+	
+	public static Wall[] generatePlayerWalls(Player player){
+		Wall[] result = new Wall[4];
+		
+		Color color = player.playerColor;
+		double playerX = player.getPoint().getX();
+		double playerY = player.getPoint().getY();
+		double lookingDirection = player.getLookingDirection().getDirectionAddedToThis(Direction.HALF_LEFT)
+				.getDirectionNumber();
+		System.out.println(lookingDirection);
+		double wallLength = player.lengthOfPlayerWall;
+		
+		double wallLengthFromMiddle = wallLength * INVRS_SQRT_2;
+		double xExtra = wallLengthFromMiddle * Math.cos(lookingDirection);
+		double yExtra = wallLengthFromMiddle * Math.sin(lookingDirection);
+		
+		Point2D topRight = new Point2D.Double(playerX + xExtra, playerY + yExtra);
+		Point2D topLeft = new Point2D.Double(playerX - yExtra, playerY + xExtra);
+		Point2D bottomLeft = new Point2D.Double(playerX - xExtra, playerY - yExtra);
+		Point2D bottomRight = new Point2D.Double(playerX + yExtra, playerY - xExtra);
+		
+		result[0] = new Wall(topRight, topLeft, color);
+		result[1] = new Wall(topLeft, bottomLeft, color);
+		result[2] = new Wall(bottomLeft, bottomRight, color);
+		result[3] = new Wall(bottomRight, topRight, color.darker());
+		
+		
+		return result;
 	}
 	
 	// from http://www.java-gaming.org/index.php?topic=22590.0

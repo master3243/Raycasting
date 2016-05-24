@@ -105,6 +105,15 @@ public class Map {
 		return result;
 	}
 	
+	public ArrayList<Wall> getCollidingPlayers(Line2D rayLine) {
+		ArrayList<Wall> result = new ArrayList<Wall>();
+		for (Wall wall : getWalls()) {
+			if (wall.intersectsLine(rayLine))
+				result.add(wall);
+		}
+		return result;
+	}
+	
 	public boolean collidesWithWall (Line2D line){
 		for (Wall wall : getWalls()) {
 			if (wall.intersectsLine(line))
@@ -120,6 +129,14 @@ public class Map {
 		return !collidesWithWall;
 	}
 
+	public void addWallArray(Wall[] arr){
+		for(Wall wall : arr)
+			physicalWalls.add(wall);
+	}
 	
+	public void addPlayerWallArray(Wall[] arr){
+		for(Wall wall : arr)
+			playerWalls.add(wall);
+	}
 
 }

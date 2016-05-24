@@ -6,6 +6,17 @@ package raycasting;
 
 public class Direction {
 	
+	
+	public static final int FULL_CIRCLE = 360;
+	public static final int HALF_CIRCLE = 180;
+	public static final int QUARTER_CIRCLE = 90;
+	
+	public static final int HALF_LEFT = QUARTER_CIRCLE / 2;
+	public static final int LEFT = QUARTER_CIRCLE;
+	public static final int HALF_RIGHT = FULL_CIRCLE - HALF_LEFT;
+	public static final int RIGHT = FULL_CIRCLE - LEFT;
+	
+	
 	private double direction;
 	
 	public Direction(double direction){
