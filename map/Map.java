@@ -5,6 +5,7 @@
 package raycasting.map;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 
 import raycasting.Util;
 import raycasting.Direction;
@@ -40,15 +41,17 @@ public class Map {
 	}
 	
 	public final ArrayList<Wall> physicalWalls = new ArrayList<>();
-	public final ArrayList<Wall> playerWalls = new ArrayList<>();
+	public final HashMap<Player, Wall[]> playersToPlayerWalls = new HashMap<>();
 	public final ArrayList<Point2D> entityLocations = new ArrayList<>();
 	
 	public ArrayList<Wall> getWalls(){
 		ArrayList<Wall> result = new ArrayList<Wall>();
 		for(Wall wall : physicalWalls)
 			result.add(wall);
-		for(Wall wall : playerWalls)
-			result.add(wall);
+		for(Wall[] wallArr : playersToPlayerWalls.values())
+			for(Wall wall : wallArr)
+				result.add(wall);
+		
 		return result;
 	}
 	
@@ -56,18 +59,17 @@ public class Map {
 		
 		WallProperties[] result = new WallProperties[World.width_resolution];
 		double degreeBetweenRays = player.getDegreeBetweenRays();
-		double playerDirection = player.getLookingDirection().getDirectionNumber();
+		double playerDirection = player.getLookingDirection().getValue();
 		Point2D playerPosition = player.getPoint();
 		double rightMostPixel = playerDirection - (player.getFOV() / 2);
 
 		for (int i = 0; i < World.width_resolution; i++) {
 			Direction rayDirection = new Direction(rightMostPixel + (degreeBetweenRays * i));
-//			System.out.println(degreeBetweenRays * i);
 			
-			double endXAxisOfRay = playerPosition.getX() + 
-					World.draw_distance * Math.cos(Math.toRadians(rayDirection.getDirectionNumber()));
-			double endYAxisOfRay = playerPosition.getY() + 
-					World.draw_distance * Math.sin(Math.toRadians(rayDirection.getDirectionNumber()));
+			double endXAxisOfRay = playerPosition.getX()
+					+ World.draw_distance * Math.cos(rayDirection.getRadValue());
+			double endYAxisOfRay = playerPosition.getY()
+					+ World.draw_distance * Math.sin(rayDirection.getRadValue());
 			Point2D endPointOfRay = new Point2D.Double(endXAxisOfRay, endYAxisOfRay);
 			Line2D rayLine = new Line2D.Double(playerPosition, endPointOfRay);
 			
@@ -134,9 +136,8 @@ public class Map {
 			physicalWalls.add(wall);
 	}
 	
-	public void addPlayerWallArray(Wall[] arr){
-		for(Wall wall : arr)
-			playerWalls.add(wall);
+	public void addPlayerWallArray(Player player, Wall[] wallArr){
+		playersToPlayerWalls.put(player, wallArr);
 	}
 
 }

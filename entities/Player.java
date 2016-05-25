@@ -68,7 +68,7 @@ public class Player {
 	}
 
 	public Direction getLookingDirection() {
-		return lookingDirection;
+		return new Direction(lookingDirection);
 	}
 
 	public void setLookingDirectionZAxis(double newValue) {
@@ -99,11 +99,11 @@ public class Player {
 	}
 	
 	public void moveOneFrame(Direction direction) {
-		double changeInX = getMovementInOneTick() * Math.cos(Math.toRadians(direction.getDirectionNumber()));
+		double changeInX = getMovementInOneTick() * Math.cos(Math.toRadians(direction.getValue()));
 		int signOfChangeInX = (int) Math.signum(changeInX);
 		double minDistanceFromWallInX = minDistanceFromWall * signOfChangeInX;
 		
-		double changeInY = getMovementInOneTick() * Math.sin(Math.toRadians(direction.getDirectionNumber()));
+		double changeInY = getMovementInOneTick() * Math.sin(Math.toRadians(direction.getValue()));
 		int signOfChangeInY = (int) Math.signum(changeInY);
 		double minDistanceFromWallInY = minDistanceFromWall * signOfChangeInY;
 
@@ -140,11 +140,13 @@ public class Player {
 	}
 
 	public void rotateOneFrameLeft() {
-		getLookingDirection().addDirection(rotationPerTick);
+		Direction lookingDirection = getLookingDirection().getDirectionAddedToThis(rotationPerTick);
+		setLookingDirection(lookingDirection);
 	}
 
 	public void rotateOneFrameRight() {
-		getLookingDirection().addDirection(-1 * rotationPerTick);
+		Direction lookingDirection = getLookingDirection().getDirectionAddedToThis(-1 * rotationPerTick);
+		setLookingDirection(lookingDirection);
 	}
 	
 	public void lookUpOneFrame(){

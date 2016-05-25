@@ -32,25 +32,23 @@ public class Util {
 		Color color = player.playerColor;
 		double playerX = player.getPoint().getX();
 		double playerY = player.getPoint().getY();
-		double lookingDirection = player.getLookingDirection().getDirectionAddedToThis(Direction.HALF_LEFT)
-				.getDirectionNumber();
-		System.out.println(lookingDirection);
 		double wallLength = player.lengthOfPlayerWall;
-		
 		double wallLengthFromMiddle = wallLength * INVRS_SQRT_2;
-		double xExtra = wallLengthFromMiddle * Math.cos(lookingDirection);
-		double yExtra = wallLengthFromMiddle * Math.sin(lookingDirection);
+		Direction firstPointDirection = player.getLookingDirection().getDirectionAddedToThis(Direction.HALF_LEFT);
+		Point2D[] wallPoints = new Point2D[4];
 		
-		Point2D topRight = new Point2D.Double(playerX + xExtra, playerY + yExtra);
-		Point2D topLeft = new Point2D.Double(playerX - yExtra, playerY + xExtra);
-		Point2D bottomLeft = new Point2D.Double(playerX - xExtra, playerY - yExtra);
-		Point2D bottomRight = new Point2D.Double(playerX + yExtra, playerY - xExtra);
+		for(int i = 0; i < wallPoints.length; i++){
+			double pointDirection = firstPointDirection.getDirectionAddedToThis(Direction.LEFT * i).getRadValue();
+			double xExtra = wallLengthFromMiddle * Math.cos(pointDirection);
+			double yExtra = wallLengthFromMiddle * Math.sin(pointDirection);
+			Point2D wallPoint = new Point2D.Double(xExtra + playerX, yExtra + playerY);
+			wallPoints[i] = wallPoint;
+		}
 		
-		result[0] = new Wall(topRight, topLeft, color);
-		result[1] = new Wall(topLeft, bottomLeft, color);
-		result[2] = new Wall(bottomLeft, bottomRight, color);
-		result[3] = new Wall(bottomRight, topRight, color.darker());
-		
+		result[0] = new Wall(wallPoints[0], wallPoints[1], color);
+		result[1] = new Wall(wallPoints[1], wallPoints[2], color);
+		result[2] = new Wall(wallPoints[2], wallPoints[3], color);
+		result[3] = new Wall(wallPoints[3], wallPoints[0], color.darker());
 		
 		return result;
 	}

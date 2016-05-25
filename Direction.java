@@ -24,11 +24,15 @@ public class Direction {
 	}
 	
 	public Direction(Direction direction){
-		this(direction.getDirectionNumber());
+		this(direction.getValue());
 	}
 	
-	public double getDirectionNumber() {
+	public double getValue() {
 		return direction;
+	}
+
+	public double getRadValue() {
+		return Math.toRadians(direction);
 	}
 
 	public void setDirection(double direction) {
@@ -39,15 +43,15 @@ public class Direction {
 	}
 	
 	public void addDirection(Direction added){
-		setDirection(getDirectionNumber() + added.direction);
+		setDirection(getValue() + added.direction);
 	}
 	
 	public void addDirection(double added){
-		setDirection(getDirectionNumber() + added);
+		setDirection(getValue() + added);
 	}
 	
 	public void subtractDirection(Direction subtracted){
-		setDirection(getDirectionNumber() - subtracted.getDirectionNumber());
+		setDirection(getValue() - subtracted.getValue());
 	}
 	
 	public boolean facingDown(){
@@ -59,11 +63,11 @@ public class Direction {
 	}
 	
 	public Direction getDirectionAddedToThis(Direction added){
-		return new Direction(getDirectionNumber() + added.getDirectionNumber());
+		return new Direction(getValue() + added.getValue());
 	}
 	
 	public Direction getDirectionAddedToThis(double added){
-		return new Direction(getDirectionNumber() + added);
+		return new Direction(getValue() + added);
 	}
 	
 }

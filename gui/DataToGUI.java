@@ -53,14 +53,14 @@ public class DataToGUI {
 	}
 
 	private void updateOtherPlayerLocation() {
-		map.playerWalls.clear();
+		map.playersToPlayerWalls.clear();
 
 		for (int i = 0; i < Player.players.size(); i++) {
 			if(i + 1 == player.playerNumber)
 				continue;
 			Player otherPlayer = Player.players.get(i);
 			Wall[] playerWalls = Util.generatePlayerWalls(otherPlayer);
-			map.addPlayerWallArray(playerWalls);
+			map.addPlayerWallArray(otherPlayer, playerWalls);
 		}
 	}
 
