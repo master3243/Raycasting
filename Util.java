@@ -44,13 +44,25 @@ public class Util {
 			Point2D wallPoint = new Point2D.Double(xExtra + playerX, yExtra + playerY);
 			wallPoints[i] = wallPoint;
 		}
-		
 		result[0] = new Wall(wallPoints[0], wallPoints[1], color);
 		result[1] = new Wall(wallPoints[1], wallPoints[2], color);
 		result[2] = new Wall(wallPoints[2], wallPoints[3], color);
 		result[3] = new Wall(wallPoints[3], wallPoints[0], color.darker());
 		
 		return result;
+	}
+	
+	public static Line2D getRayLine(Point2D loc, Direction direction){
+		double xStart = loc.getX();
+		double yStart = loc.getY();
+		
+		double deltaX = World.draw_distance * Math.cos(direction.getRadValue());
+		double deltaY = World.draw_distance * Math.sin(direction.getRadValue());
+		
+		double xEnd = xStart + deltaX;
+		double yEnd = yStart + deltaY;
+		
+		return new Line2D.Double(xStart, yStart, xEnd, yEnd);
 	}
 	
 	// from http://www.java-gaming.org/index.php?topic=22590.0

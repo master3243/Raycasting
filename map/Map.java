@@ -65,15 +65,9 @@ public class Map {
 
 		for (int i = 0; i < World.width_resolution; i++) {
 			Direction rayDirection = new Direction(rightMostPixel + (degreeBetweenRays * i));
+			Line2D rayLine = Util.getRayLine(playerPosition, rayDirection);
 			
-			double endXAxisOfRay = playerPosition.getX()
-					+ World.draw_distance * Math.cos(rayDirection.getRadValue());
-			double endYAxisOfRay = playerPosition.getY()
-					+ World.draw_distance * Math.sin(rayDirection.getRadValue());
-			Point2D endPointOfRay = new Point2D.Double(endXAxisOfRay, endYAxisOfRay);
-			Line2D rayLine = new Line2D.Double(playerPosition, endPointOfRay);
-			
-			Wall closestWall = nearestWall(rayLine);
+			Wall closestWall = getNearestWall(rayLine);
 			if(closestWall == null)	
 				continue;
 			double wallDistance = Util.getDistance(rayLine, closestWall);
@@ -83,7 +77,7 @@ public class Map {
 		return result;
 	}
 
-	public Wall nearestWall(Line2D rayLine) {
+	public Wall getNearestWall(Line2D rayLine) {
 		ArrayList<Wall> collidingWalls = getCollidingWalls(rayLine);
 		double min = Integer.MAX_VALUE;
 		double distance;
@@ -97,17 +91,23 @@ public class Map {
 		}
 		return min >= World.draw_distance ? null : result;
 	}
+	
+	public Player getNearestInSightPlayer(Line2D rayLine){
+		Wall nearestWall = getNearestWall(rayLine);
+		for(Wall x : physicalWalls)
+			if(x == nearestWall)
+				return null;
+		for(Player p : Player.players){
+			if(this == p.map)
+				continue;
+			for(Wall x : playersToPlayerWalls.get(p))
+				if (x == nearestWall)
+					return p;
+		}
+		return null;
+	}
 
 	public ArrayList<Wall> getCollidingWalls(Line2D rayLine) {
-		ArrayList<Wall> result = new ArrayList<Wall>();
-		for (Wall wall : getWalls()) {
-			if (wall.intersectsLine(rayLine))
-				result.add(wall);
-		}
-		return result;
-	}
-	
-	public ArrayList<Wall> getCollidingPlayers(Line2D rayLine) {
 		ArrayList<Wall> result = new ArrayList<Wall>();
 		for (Wall wall : getWalls()) {
 			if (wall.intersectsLine(rayLine))

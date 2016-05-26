@@ -22,7 +22,8 @@ public class DataToGUI {
 
 	private static final Color skyColor = new Color(0, 255, 255);
 	private static final Color groundColor = new Color(130, 90, 44);
-
+	private static final int multiplicationConstant = 5000;//trial and error
+	
 	public DataToGUI(GUI gui, Map map, Player player) {
 		this.gui = gui;
 		this.map = map;
@@ -30,8 +31,8 @@ public class DataToGUI {
 	}
 
 	public void update() {
-		keyboard_check();
 		updateGUI();
+		keyboard_check();
 	}
 
 	private void keyboard_check() {
@@ -77,7 +78,7 @@ public class DataToGUI {
 				continue;
 			}
 			double x = gui.widthOfWindow - widthOfRectangle * (i + 1);
-			double height = (5000 / wallProperties[i].distance);
+			double height = (multiplicationConstant / wallProperties[i].distance);
 			// double height = (500 - wallProp[i].distance*10); trying out
 			// different methods,, not good
 

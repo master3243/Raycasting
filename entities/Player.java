@@ -5,20 +5,23 @@
 package raycasting.entities;
 
 import java.awt.Color;
+import java.awt.geom.Line2D;
 import java.awt.geom.Point2D;
 import java.util.ArrayList;
 
+import raycasting.Cooldown;
 import raycasting.Direction;
+import raycasting.Util;
 import raycasting.World;
 import raycasting.keyboard.KeyboardInput;
 import raycasting.map.Map;
 
 public class Player {
-	
+
 	public static final int millisecondsBetweenTicks = World.millisecondsBetweenTicks;
 	public static final ArrayList<Player> players = new ArrayList<>();
 	private static int playerCount = 1;
-	
+
 	public final Map map;
 	public final int[] controls;
 	public final int playerNumber;
@@ -30,25 +33,25 @@ public class Player {
 	public final double minDistanceFromWall = 2;
 	public final double lengthOfPlayerWall = 3;
 	public final int originalPOV = 120;
-	public final double staminaDurationInSeconds = 5;
-	public final double runningDistanceMultiplier = 2;
+	public final double staminaDurationInSeconds = 2;
+	public final double stamicMinUse = 10;
+	public final double runningDistanceMultiplier = 20;
 	public final double runningDistancePerSecond = runningDistanceMultiplier * movementPerSecond;
-//	public double cooldownDurationInSeconds = 1;
-	
+	// public double cooldownDurationInSeconds = 1;
+
+	private final Cooldown stamina = new Cooldown(staminaDurationInSeconds, stamicMinUse);
 	private final double movementPerTick = movementPerSecond / World.FPS;
 	private final double rotationPerTick = rotationPerSecond / World.FPS;
 	private final double zAxisRotationPerTick = zAxisrotationPerSecond / World.FPS;
-	private final double staminaDurationInTicks = staminaDurationInSeconds * World.FPS;
 	private final double runningDistancePerTick = runningDistancePerSecond / World.FPS;
-	
+
 	private double x = 0;
 	private double y = 0;
 	private Direction lookingDirection = new Direction(0);
 	private double lookingDirectionZAxis = 0;
-	private double staminaPercentage = 100;
 	private boolean isRunning = false;
 	private int pov = originalPOV;
-	
+
 	public Player(Map map, Color playerColor, int[] controls) {
 		this.map = map;
 		this.controls = controls;
@@ -82,28 +85,28 @@ public class Player {
 	public Point2D getPoint() {
 		return new Point2D.Double(x, y);
 	}
-	
-	public double getMovementInOneTick(){
-		if(isRunning)
+
+	public double getMovementInOneTick() {
+		if (isRunning)
 			return runningDistancePerTick;
 		else
 			return movementPerTick;
 	}
-	
-	public double getDegreeBetweenRays(){
+
+	public double getDegreeBetweenRays() {
 		return (double) pov / World.width_resolution;
 	}
-	
-	public int getFOV(){
+
+	public int getFOV() {
 		return pov;
 	}
-	
+
 	public void moveOneFrame(Direction direction) {
-		double changeInX = getMovementInOneTick() * Math.cos(Math.toRadians(direction.getValue()));
+		double changeInX = getMovementInOneTick() * Math.cos(direction.getRadValue());
 		int signOfChangeInX = (int) Math.signum(changeInX);
 		double minDistanceFromWallInX = minDistanceFromWall * signOfChangeInX;
-		
-		double changeInY = getMovementInOneTick() * Math.sin(Math.toRadians(direction.getValue()));
+
+		double changeInY = getMovementInOneTick() * Math.sin(direction.getRadValue());
 		int signOfChangeInY = (int) Math.signum(changeInY);
 		double minDistanceFromWallInY = minDistanceFromWall * signOfChangeInY;
 
@@ -148,55 +151,51 @@ public class Player {
 		Direction lookingDirection = getLookingDirection().getDirectionAddedToThis(-1 * rotationPerTick);
 		setLookingDirection(lookingDirection);
 	}
-	
-	public void lookUpOneFrame(){
+
+	public void lookUpOneFrame() {
 		if (lookingDirectionZAxis > -zAxisMaxRotation)
 			lookingDirectionZAxis += zAxisRotationPerTick;
 	}
-	
-	public void lookDownOneFrame(){
+
+	public void lookDownOneFrame() {
 		if (lookingDirectionZAxis < zAxisMaxRotation)
 			lookingDirectionZAxis += -zAxisRotationPerTick;
 	}
-	
-	private void staminaUpdate(boolean buttonActive){
+
+	private void staminaUpdate(boolean buttonActive) {
 		pov = originalPOV;
-		if(buttonActive && staminaPercentage > 0){
+		if (buttonActive && stamina.canUse()) {
+			stamina.decrease();
 			isRunning = true;
-			decreaseStamina();
 			pov += 20;
 		} else {
-			increaseStamina();
+			stamina.increase();
 			isRunning = false;
 		}
 	}
-	
-	private void increaseStamina(){
-		staminaPercentage += 100 / staminaDurationInTicks;
-		if(staminaPercentage > 100)
-			staminaPercentage = 100;
+
+	private void shoot(boolean buttonActive) {
+		if (buttonActive) {
+			Line2D inFront = Util.getRayLine(getPoint(), getLookingDirection());
+			Player nearestPlayer = map.getNearestInSightPlayer(inFront);
+			if (nearestPlayer != null)
+				System.out.println(nearestPlayer.playerNumber);
+			else
+				System.out.println("null");
+		} else {
+			
+		}
 	}
-	
-	private void decreaseStamina(){
-		staminaPercentage -= 100 / staminaDurationInTicks;
-		if(staminaPercentage < 0)
-			staminaPercentage = 0;
-	}
-	
-	private void shoot(){
-		
-	}
-	
-	public void haveBeenShot(){
-		
+
+	public void haveBeenShot() {
+
 	}
 
 	public void updatePlayer(KeyboardInput KB) {
-		if(KB.keyDown(controls[8]))
-			staminaUpdate(true);
-		else
-			staminaUpdate(false);
-		
+
+		staminaUpdate(KB.keyDown(controls[8]));
+		shoot(KB.keyDown(controls[9]));
+
 		if (KB.keyDown(controls[0]))
 			moveOneFrameForward();
 		if (KB.keyDown(controls[1]))
@@ -213,9 +212,7 @@ public class Player {
 			lookDownOneFrame();
 		if (KB.keyDown(controls[7]))
 			rotateOneFrameRight();
-		if(KB.keyDown(controls[8]))
-			shoot();
-		
+
 	}
 
 }
