@@ -47,8 +47,12 @@ public class Cooldown {
 			percentage = 0;
 	}
 	
+	public void empty(){
+		percentage = 0;
+	}
+	
 	public boolean canUse(){
-		if(percentage > lowerLimit)
+		if(percentage >= lowerLimit)
 			return true;
 		if(percentage > 0 && !inCooldown)
 			return true;

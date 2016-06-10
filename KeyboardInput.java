@@ -1,4 +1,4 @@
-package raycasting.keyboard;
+package raycasting;
 
 import java.awt.event.KeyEvent;
 

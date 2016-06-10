@@ -7,13 +7,14 @@ package raycasting.entities;
 import java.awt.Color;
 import java.awt.geom.Line2D;
 import java.awt.geom.Point2D;
+import java.awt.geom.Rectangle2D;
 import java.util.ArrayList;
 
 import raycasting.Cooldown;
 import raycasting.Direction;
+import raycasting.KeyboardInput;
 import raycasting.Util;
 import raycasting.World;
-import raycasting.keyboard.KeyboardInput;
 import raycasting.map.Map;
 
 public class Player {
@@ -33,25 +34,34 @@ public class Player {
 	public final double minDistanceFromWall = 2;
 	public final double lengthOfPlayerWall = 3;
 	public final int originalPOV = 120;
+	public final double maxHealth = 100;
+	public final double healthRegenPerSecond = 20;
+	public final double healthRegenCooldownInSeconds = 3;
+	public final double damagePerBullet = 50;
 	public final double staminaDurationInSeconds = 2;
-	public final double stamicMinUse = 10;
-	public final double runningDistanceMultiplier = 20;
+	public final double staminaMinUse = 50;
+	public final double runningDistanceMultiplier = 2;
 	public final double runningDistancePerSecond = runningDistanceMultiplier * movementPerSecond;
-	// public double cooldownDurationInSeconds = 1;
+	public final double shotsPerSecond = 1;// / 2.0;
 
-	private final Cooldown stamina = new Cooldown(staminaDurationInSeconds, stamicMinUse);
+	private final Cooldown healthCooldown = new Cooldown(healthRegenCooldownInSeconds, 100);
+	private final Cooldown staminaCooldown = new Cooldown(staminaDurationInSeconds, staminaMinUse);
+	private final Cooldown gunCooldown = new Cooldown(shotsPerSecond, 100);
 	private final double movementPerTick = movementPerSecond / World.FPS;
 	private final double rotationPerTick = rotationPerSecond / World.FPS;
 	private final double zAxisRotationPerTick = zAxisrotationPerSecond / World.FPS;
+	private final double healthRegenPerTick = healthRegenPerSecond / World.FPS;
 	private final double runningDistancePerTick = runningDistancePerSecond / World.FPS;
 
+	private int pov = originalPOV;
 	private double x = 0;
 	private double y = 0;
 	private Direction lookingDirection = new Direction(0);
 	private double lookingDirectionZAxis = 0;
+	private double health = maxHealth;
 	private boolean isRunning = false;
-	private int pov = originalPOV;
-
+	private int moneyInBackPack = 0;
+	
 	public Player(Map map, Color playerColor, int[] controls) {
 		this.map = map;
 		this.controls = controls;
@@ -61,21 +71,8 @@ public class Player {
 		playerCount++;
 	}
 
-	public void setPoint(Point2D point) {
-		x = point.getX();
-		y = point.getY();
-	}
-
-	public void setLookingDirection(Direction lookingDirection) {
-		this.lookingDirection = lookingDirection;
-	}
-
 	public Direction getLookingDirection() {
 		return new Direction(lookingDirection);
-	}
-
-	public void setLookingDirectionZAxis(double newValue) {
-		this.lookingDirectionZAxis = newValue;
 	}
 
 	public double getLookingDirectionZAxis() {
@@ -86,6 +83,7 @@ public class Player {
 		return new Point2D.Double(x, y);
 	}
 
+	
 	public double getMovementInOneTick() {
 		if (isRunning)
 			return runningDistancePerTick;
@@ -101,6 +99,23 @@ public class Player {
 		return pov;
 	}
 
+	public double getHealth() {
+		return health;
+	}
+
+	public void setPoint(Point2D point) {
+		x = point.getX();
+		y = point.getY();
+	}
+
+	public void setLookingDirection(Direction lookingDirection) {
+		this.lookingDirection = lookingDirection;
+	}
+
+	public void setLookingDirectionZAxis(double newValue) {
+		this.lookingDirectionZAxis = newValue;
+	}
+
 	public void moveOneFrame(Direction direction) {
 		double changeInX = getMovementInOneTick() * Math.cos(direction.getRadValue());
 		int signOfChangeInX = (int) Math.signum(changeInX);
@@ -113,9 +128,9 @@ public class Player {
 		Point2D newXPos = new Point2D.Double(x + changeInX + minDistanceFromWallInX, y);
 		Point2D newYPos = new Point2D.Double(x, y + changeInY + minDistanceFromWallInY);
 
-		if (!map.canMove(getPoint(), newXPos))
+		if (!map.canMove(getPoint(), newXPos, this))
 			changeInX = 0;
-		if (!map.canMove(getPoint(), newYPos))
+		if (!map.canMove(getPoint(), newYPos, this))
 			changeInY = 0;
 
 		x += changeInX;
@@ -153,46 +168,71 @@ public class Player {
 	}
 
 	public void lookUpOneFrame() {
-		if (lookingDirectionZAxis > -zAxisMaxRotation)
+		if (lookingDirectionZAxis < zAxisMaxRotation)
 			lookingDirectionZAxis += zAxisRotationPerTick;
 	}
 
 	public void lookDownOneFrame() {
-		if (lookingDirectionZAxis < zAxisMaxRotation)
-			lookingDirectionZAxis += -zAxisRotationPerTick;
+		if (lookingDirectionZAxis > -zAxisMaxRotation)
+			lookingDirectionZAxis -= zAxisRotationPerTick;
+	}
+
+	private void healthUpdate() {
+		healthCooldown.increase();
+		if (healthCooldown.canUse())
+			healthIncrease();
+	}
+
+	private void healthIncrease() {
+		health += healthRegenPerTick;
+		if (health > maxHealth)
+			health = maxHealth;
 	}
 
 	private void staminaUpdate(boolean buttonActive) {
 		pov = originalPOV;
-		if (buttonActive && stamina.canUse()) {
-			stamina.decrease();
+		if (buttonActive && staminaCooldown.canUse()) {
+			staminaCooldown.decrease();
 			isRunning = true;
 			pov += 20;
 		} else {
-			stamina.increase();
+			staminaCooldown.increase();
 			isRunning = false;
 		}
 	}
 
 	private void shoot(boolean buttonActive) {
-		if (buttonActive) {
+		if (buttonActive && gunCooldown.canUse()) {
+			gunCooldown.empty();
 			Line2D inFront = Util.getRayLine(getPoint(), getLookingDirection());
-			Player nearestPlayer = map.getNearestInSightPlayer(inFront);
+			Player nearestPlayer = map.getNearestInSightPlayer(inFront, this);
 			if (nearestPlayer != null)
-				System.out.println(nearestPlayer.playerNumber);
-			else
-				System.out.println("null");
+				nearestPlayer.haveBeenShot();
 		} else {
-			
+			gunCooldown.increase();
 		}
 	}
 
 	public void haveBeenShot() {
-
+		healthCooldown.empty();
+		health -= damagePerBullet;
 	}
-
+	
+	public int getMoenyInBP(){
+		return moneyInBackPack;
+	}
+	
+	public void setMoneyInBP(int money){
+		moneyInBackPack = money;
+	}
+	
+	public void increaseMoneyInBP(int amount){
+		moneyInBackPack += amount;
+	}
+	
 	public void updatePlayer(KeyboardInput KB) {
 
+		healthUpdate();
 		staminaUpdate(KB.keyDown(controls[8]));
 		shoot(KB.keyDown(controls[9]));
 
