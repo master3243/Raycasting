@@ -8,29 +8,26 @@ import java.awt.Color;
 import java.util.ArrayList;
 
 import raycasting.Main;
-import raycasting.Util;
 import raycasting.WallProperties;
 import raycasting.entities.Base;
-import raycasting.entities.Entity;
 import raycasting.entities.Player;
-import raycasting.entities.Wall;
 import raycasting.map.Map;
 
 public class DataToGUI {
 
 	private GUI gui;
 	private Map map;
-	private Player player;
-
+	private int playerNumber;
+	
 	private static final Color skyColor = new Color(0, 255, 255);
 	private static final Color groundColor = new Color(130, 90, 44);
 	private static final int rayHeightMultiplicationConstant = 5000; // trial-and-error
 	private static final int damageToRedScreenMultiplicationConstant = 1; // trial-and-error
 
-	public DataToGUI(GUI gui, Map map, Player player) {
+	public DataToGUI(GUI gui, Map map, int playerNumber) {
 		this.gui = gui;
 		this.map = map;
-		this.player = player;
+		this.playerNumber = playerNumber;
 	}
 
 	public void update() {
@@ -40,59 +37,42 @@ public class DataToGUI {
 
 	private void keyboard_check() {
 		Main.keyboard.poll();
-		player.updatePlayer(Main.keyboard);
+		Player p = Player.players.get(playerNumber);
+		p.updatePlayer(Main.keyboard);
 	}
 
 	private void updateGUI() {
 		gui.clearRectangles();
 
-		updatePlayerLocations();
-		updateEntityLocations();
+		map.updatePlayerLocations();
+		map.updateEntityLocations();
 		updateUI();
 		
 		Rectangle[] background = getBackground();
 		gui.addRectangles(background);
 
-		ArrayList<Rectangle> walls = wallPropertiesToRectangles(map, player);
+		ArrayList<Rectangle> walls = wallPropertiesToRectangles(map, playerNumber);
 		gui.addRectangles(walls);
 
 		gui.repaint();
 	}
-
-	private void updatePlayerLocations() {
-		map.playersToPlayerWalls.clear();
-
-		for (int i = 0; i < Player.players.size(); i++) {
-			Player player = Player.players.get(i);
-			Wall[] playerWalls = Util.generatePlayerWalls(player);
-			map.addPlayerWallArray(player, playerWalls);
-		}
-	}
-	
-	private void updateEntityLocations() {
-		map.entitiesToEntityWalls.clear();
-		
-		for (int i = 0; i < map.entities.size(); i++) {
-			Entity entity = map.entities.get(i);
-			Wall[] entityWalls = Util.generateEntityWalls(entity);
-			map.addEntityWallArray(entity, entityWalls);
-		}
-	}
 	
 	private void updateUI(){
-		gui.moneyInBP = player.getMoenyInBP();
-		Base temp = map.getBase(player);
+		Player p = Player.players.get(playerNumber);
+		gui.moneyInBP = p.getMoenyInBP();
+		Base temp = map.getBase(playerNumber);
 		if(temp != null)
 			gui.moneyInBase = temp.getMoney();
 	}
 	
-	private ArrayList<Rectangle> wallPropertiesToRectangles(Map map, Player player) {
-		WallProperties[] wallProperties = map.generateWallPropertiesArray(player);
+	private ArrayList<Rectangle> wallPropertiesToRectangles(Map map, int playerNumber) {
+		WallProperties[] wallProperties = map.generateWallPropertiesArray(playerNumber);
 		ArrayList<Rectangle> result = new ArrayList<Rectangle>();
 
 		int numOfRetangles = wallProperties.length; // World.width_resolution
 		double widthOfRectangle = (double) gui.widthOfWindow / numOfRetangles;
-		double heightOfEyeLevel = player.getLookingDirectionZAxis();
+		Player p = Player.players.get(playerNumber);
+		double heightOfEyeLevel = p.getLookingDirectionZAxis();
 
 		for (int i = 0; i < wallProperties.length; i++) {
 			if (wallProperties[i] == null) {
@@ -114,8 +94,9 @@ public class DataToGUI {
 
 	private Rectangle[] getBackground() {
 		Rectangle[] result = new Rectangle[2];
-
-		double middleOfLookingDirectionZAxis = gui.heightOfWindow / 2 + player.getLookingDirectionZAxis();
+		
+		double playerLookingDirectionZAxis = Player.players.get(playerNumber).getLookingDirectionZAxis();
+		double middleOfLookingDirectionZAxis = gui.heightOfWindow / 2 + playerLookingDirectionZAxis;
 		Color newSkyColor = new Color(skyColor.getRGB());
 		newSkyColor = editColorBasedOnHealth(newSkyColor);
 		Color newGroundColor = new Color(groundColor.getRGB());
@@ -133,7 +114,9 @@ public class DataToGUI {
 
 	private Color editColorBasedOnHealth(Color oldColor) {
 		Color newColor = null;
-		int changeInRed = (int) (player.maxHealth - player.getHealth()) * damageToRedScreenMultiplicationConstant;
+		double maxHealth = Player.players.get(playerNumber).maxHealth;
+		double playerHealth = Player.players.get(playerNumber).getHealth();
+		int changeInRed = (int) (maxHealth - playerHealth) * damageToRedScreenMultiplicationConstant;
 
 		int red = oldColor.getRed() + changeInRed;
 		if (red > 255)

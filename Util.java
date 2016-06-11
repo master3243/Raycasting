@@ -28,11 +28,11 @@ public class Util {
 		return distance;
 	}
 
-	public static Wall[] generatePlayerWalls(Player player) {
+	public static Wall[] generatePlayerWalls(int playerNumber) {
 		Wall[] result = new Wall[4];
-
-		Color color = player.playerColor;
-		Point2D[] wallPoints = generatePlayerPoints(player);
+		
+		Color color = Player.players.get(playerNumber).playerColor;
+		Point2D[] wallPoints = generatePlayerPoints(playerNumber);
 
 		result[0] = new Wall(wallPoints[0], wallPoints[1], color);
 		result[1] = new Wall(wallPoints[1], wallPoints[2], color);
@@ -43,7 +43,9 @@ public class Util {
 	}
 
 	
-	private static Point2D[] generatePlayerPoints(Player player){
+	private static Point2D[] generatePlayerPoints(int playerNumber){
+		Player player = Player.players.get(playerNumber);
+		
 		double playerX = player.getPoint().getX();
 		double playerY = player.getPoint().getY();
 		double wallLength = player.lengthOfPlayerWall;

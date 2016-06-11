@@ -10,27 +10,38 @@ import java.awt.geom.Point2D;
 public class Base extends Entity {
 	
 	private int money = 0;
-	public final Player owner;
+	public final int OwnerNumber;
 	
-	public Base(Point2D loc, int size, Color col, Player player) {
+	public Base(Point2D loc, int size, Color col, int OwnerNumber) {
 		super(loc, size, col);
-		owner = player;
+		this.OwnerNumber = OwnerNumber;
 	}
 
-	@Override
-	public void playerTouch(Player p) {
-		if(p == owner){
-			money += p.getMoenyInBP();
-			p.setMoneyInBP(0);
-		}
-	}
-	
 	public void increaseMoney(int amount){
 		money += amount;
 	}
 	
 	public int getMoney(){
 		return money;
+	}
+
+	@Override
+	public void playerTouch(int playerNumber) {
+		if(playerNumber == OwnerNumber){
+			Player p = Player.players.get(playerNumber);
+			money += p.getMoenyInBP();
+			p.setMoneyInBP(0);
+		}
+	}
+
+	@Override
+	public double getWaitTime() {
+		return 5;
+	}
+
+	@Override
+	public String getProperties() {
+		return "Base" + OwnerNumber;
 	}
 
 }

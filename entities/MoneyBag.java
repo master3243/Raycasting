@@ -19,9 +19,20 @@ public class MoneyBag extends Entity {
 	}
 
 	@Override
-	public void playerTouch(Player p) {
+	public void playerTouch(int playerNumber) {
+		Player p = Player.players.get(playerNumber);
 		p.increaseMoneyInBP(amount);
-		Main.map.removeEntity(this);
+		Main.gameEngine.removeEntity(this);
+	}
+
+	@Override
+	public double getWaitTime() {
+		return 3;
+	}
+
+	@Override
+	public String getProperties() {
+		return "MoneyBag";
 	}
 
 }

@@ -20,16 +20,20 @@ public abstract class Entity {
 		color = col;
 	}
 	
-	public boolean isPlayerTouching(Player p){
+	public boolean isPlayerTouching(int playerNumber){
 		Rectangle2D entityLoc = new Rectangle2D.Double(location.getX()-wallLength/2,
 													location.getY()-wallLength/2,
 													wallLength,
 													wallLength);
+		Player p = Player.players.get(playerNumber);
 		Point2D playerLoc = p.getPoint();
 		return entityLoc.contains(playerLoc);
 	}
 	
-	public abstract void playerTouch(Player p);
+	public abstract void playerTouch(int playerNumber);
 	
+	public abstract double getWaitTime();
+	
+	public abstract String getProperties();
 	
 }

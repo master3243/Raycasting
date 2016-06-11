@@ -24,23 +24,6 @@ import java.lang.reflect.InvocationTargetException;
 public class Map {
 
 	public Map(int mapNumber) {
-		switch (mapNumber) {
-		case 1:
-			MapData.generateMap1(this);
-			break;
-		case 2:
-			MapData.generateMap2(this);
-			break;
-		case 3:
-			MapData.generateMap3(this);
-			break;
-		case 4:
-			MapData.generateMap4(this);
-			break;
-		case 5:
-			MapData.generateMap5(this);
-			break;
-		}
 		java.lang.reflect.Method[] methods = MapData.class.getMethods();
 		for(java.lang.reflect.Method m : methods)
 			if(m.getName().equals("generateMap" + mapNumber))
@@ -51,29 +34,38 @@ public class Map {
 				}
 		
 	}
-
+	
+	public final ArrayList<Point2D> entitySpawnLocations = new ArrayList<>();
+	
 	public final ArrayList<Wall> physicalWalls = new ArrayList<>();
-	public final HashMap<Player, Wall[]> playersToPlayerWalls = new HashMap<>();
+	public final HashMap<Integer, Wall[]> playerNumberToPlayerWalls = new HashMap<>();
 	public final ArrayList<Entity> entities = new ArrayList<>();
 	public final HashMap<Entity, Wall[]> entitiesToEntityWalls = new HashMap<>();
 	
 	
-	public ArrayList<Wall> getWalls() {
-		ArrayList<Wall> result = new ArrayList<Wall>();
-		for (Wall wall : physicalWalls)
-			result.add(wall);
-		for (Wall[] wallArr : playersToPlayerWalls.values())
-			for (Wall wall : wallArr)
-				result.add(wall);
-		for (Wall[] wallArr : entitiesToEntityWalls.values())
-			for (Wall wall : wallArr)
-				result.add(wall);
-		
-		return result;
+	public void updatePlayerLocations() {
+		playerNumberToPlayerWalls.clear();
+
+		for (int i = 0; i < Player.players.size(); i++) {
+			Wall[] playerWalls = Util.generatePlayerWalls(i);
+			addPlayerWallArray(i, playerWalls);
+		}
 	}
-
-	public WallProperties[] generateWallPropertiesArray(Player player) {
-
+	
+	public void updateEntityLocations() {
+		entitiesToEntityWalls.clear();
+		
+		for (int i = 0; i < entities.size(); i++) {
+			Entity entity = entities.get(i);
+			
+			Wall[] entityWalls = Util.generateEntityWalls(entity);
+			addEntityWallArray(entity, entityWalls);
+		}
+	}
+ 
+	public WallProperties[] generateWallPropertiesArray(int playerNumber) {
+		Player player = Player.players.get(playerNumber);
+		
 		WallProperties[] result = new WallProperties[World.width_resolution];
 		double degreeBetweenRays = player.getDegreeBetweenRays();
 		double playerDirection = player.getLookingDirection().getValue();
@@ -84,7 +76,7 @@ public class Map {
 			Direction rayDirection = new Direction(rightMostPixel + (degreeBetweenRays * i));
 			Line2D rayLine = Util.getRayLine(playerPosition, rayDirection);
 
-			Wall closestWall = getNearestWall(rayLine, player);
+			Wall closestWall = getNearestWall(rayLine, playerNumber);
 			if (closestWall == null)
 				continue;
 			double wallDistance = Util.getDistance(rayLine, closestWall);
@@ -94,13 +86,13 @@ public class Map {
 		return result;
 	}
 
-	public Wall getNearestWall(Line2D rayLine, Player playerWallToAvoid) {
-		ArrayList<Wall> collidingWalls = getCollidingWalls(rayLine, playerWallToAvoid);
+	public Wall getNearestWall(Line2D rayLine, int playerNumberToIgnore) {
+		ArrayList<Wall> collidingWalls = getCollidingWalls(rayLine, playerNumberToIgnore);
 		double min = Integer.MAX_VALUE;
 		double distance;
 		Wall result = null;
 		for (Wall wall : collidingWalls) {
-			if(wallBelongsToPlayer(wall, playerWallToAvoid))
+			if(wallBelongsToPlayer(wall, playerNumberToIgnore))
 				continue;
 			
 			distance = Util.getDistance(rayLine, wall);
@@ -111,49 +103,63 @@ public class Map {
 		}
 		return min >= World.draw_distance ? null : result;
 	}
+
+	public ArrayList<Wall> getCollidingWalls(Line2D rayLine, int playerNumberToIgnore) {
+		ArrayList<Wall> result = new ArrayList<Wall>();
+		for (Wall wall : getWalls()) {
+			if (wall.intersectsLine(rayLine) && !wallBelongsToPlayer(wall, playerNumberToIgnore))
+				result.add(wall);
+		}
+		return result;
+	}
 	
-	private boolean wallBelongsToPlayer(Wall wall, Player player){
-		for(Wall w : playersToPlayerWalls.get(player)){
+	public ArrayList<Wall> getWalls() {
+		ArrayList<Wall> result = new ArrayList<Wall>();
+		for (Wall wall : physicalWalls)
+			result.add(wall);
+		for (Wall[] wallArr : playerNumberToPlayerWalls.values())
+			for (Wall wall : wallArr)
+				result.add(wall);
+		for (Wall[] wallArr : entitiesToEntityWalls.values())
+			for (Wall wall : wallArr)
+				result.add(wall);
+		
+		return result;
+	}
+	
+	private boolean wallBelongsToPlayer(Wall wall, int playerNumberToIgnore){
+		for(Wall w : playerNumberToPlayerWalls.get(playerNumberToIgnore)){
 			if (wall == w)
 				return true;
 		}
 		return false;
 	}
 	
-	public Player getNearestInSightPlayer(Line2D rayLine, Player playerWallToAvoid) {
-		Wall nearestWall = getNearestWall(rayLine, playerWallToAvoid);
+	public Player getNearestInSightPlayer(Line2D rayLine, int playerNumberToIgnore) {
+		Wall nearestWall = getNearestWall(rayLine, playerNumberToIgnore);
 		for (Wall x : physicalWalls)
 			if (x == nearestWall)
 				return null;
-		for (Player p : Player.players) {
-			for (Wall x : playersToPlayerWalls.get(p))
+		for (int i = 0; i < Player.players.size(); i++) {
+			for (Wall x : playerNumberToPlayerWalls.get(i))
 				if (x == nearestWall)
-					return p;
+					return Player.players.get(i);
 		}
 		return null;
 	}
 
-	public ArrayList<Wall> getCollidingWalls(Line2D rayLine, Player playerWallToAvoid) {
-		ArrayList<Wall> result = new ArrayList<Wall>();
+	public boolean collidesWithWall(Line2D line, int playerNumberToIgnore) {
 		for (Wall wall : getWalls()) {
-			if (wall.intersectsLine(rayLine) && !wallBelongsToPlayer(wall, playerWallToAvoid))
-				result.add(wall);
-		}
-		return result;
-	}
-
-	public boolean collidesWithWall(Line2D line, Player playerWallToAvoid) {
-		for (Wall wall : getWalls()) {
-			if (wall.intersectsLine(line) && !wallBelongsToPlayer(wall, playerWallToAvoid))
+			if (wall.intersectsLine(line) && !wallBelongsToPlayer(wall, playerNumberToIgnore))
 				if (!wall.isWalkable)
 					return true;
 		}
 		return false;
 	}
 
-	public boolean canMove(Point2D from, Point2D to, Player playerWallToAvoid) {
+	public boolean canMove(Point2D from, Point2D to, int playerNumberToIgnore) {
 		Line2D changeInPosition = new Line2D.Double(from, to);
-		boolean doesntCollidesWithWall = !collidesWithWall(changeInPosition, playerWallToAvoid);
+		boolean doesntCollidesWithWall = !collidesWithWall(changeInPosition, playerNumberToIgnore);
 		return doesntCollidesWithWall;
 	}
 
@@ -162,35 +168,22 @@ public class Map {
 			physicalWalls.add(wall);
 	}
 
-	public void addPlayerWallArray(Player player, Wall[] wallArr) {
-		playersToPlayerWalls.put(player, wallArr);
-	}
-
-	public void updateEntities(){
-
-		for(Player p : Player.players){
-			for(Entity e : entitiesToEntityWalls.keySet()){
-				if(e.isPlayerTouching(p)){
-					e.playerTouch(p);
-				}
-			}
-		}
-	}
-
-	public void removeEntity(Entity e){
-		entities.remove(e);
+	public void addPlayerWallArray(int playerNumber, Wall[] wallArr) {
+		playerNumberToPlayerWalls.put(playerNumber, wallArr);
 	}
 
 	public void addEntityWallArray(Entity entity, Wall[] wallArr) {
 		entitiesToEntityWalls.put(entity, wallArr);
 	}
 
-	public Base getBase(Player p){
+	public Base getBase(int playerNumber){
 		for(Entity e : entities)
 			if(e.getClass().getSimpleName().equals("Base"))
-				if(((Base) e).owner == p)
+				if(((Base) e).OwnerNumber == playerNumber)
 					return ((Base) e);
 		return null;
 	}
+	
+	
 }
 

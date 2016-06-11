@@ -5,6 +5,7 @@
 package raycasting.map;
 
 import java.awt.Color;
+import java.awt.geom.Point2D;
 
 import raycasting.entities.Wall;
 
@@ -90,14 +91,14 @@ public class MapData {
 		return result;
 	}
 
-	public static void generateMapFromArray(Map map, int[][] arr, int wallLength, Color color) {
+	public static void generateMapFromArray(Map map, int[][] arr, double wallLength, Color color) {
 		for (int r = 0; r < arr.length; r++)
 			for (int c = 0; c < arr[0].length; c++) {
 				if (arr[r][c] == 1) {
-					int x1 = c * wallLength;
-					int y1 = -1 * r * wallLength;
-					int x2 = c * wallLength + wallLength;
-					int y2 = -1 * r * wallLength - wallLength;
+					double x1 = c * wallLength;
+					double y1 = -1 * r * wallLength;
+					double x2 = c * wallLength + wallLength;
+					double y2 = -1 * r * wallLength - wallLength;
 
 					boolean generateTop = r != 0 && arr[r - 1][c] != 1;
 					boolean generateLeft = c != 0 && arr[r][c - 1] != 1;
@@ -114,7 +115,8 @@ public class MapData {
 						map.physicalWalls.add(new Wall(x2, y2, x1, y2, color));
 				}
 				if (arr[r][c] == 2) {
-					//TODO add spawn locations add entities like money
+					map.entitySpawnLocations.add(
+							new Point2D.Double((c + 0.5) * wallLength, (-1 * (r - 0.5) * wallLength)) );
 				}
 			}
 	}

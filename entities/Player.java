@@ -126,9 +126,9 @@ public class Player {
 		Point2D newXPos = new Point2D.Double(x + changeInX + minDistanceFromWallInX, y);
 		Point2D newYPos = new Point2D.Double(x, y + changeInY + minDistanceFromWallInY);
 
-		if (!map.canMove(getPoint(), newXPos, this))
+		if (!map.canMove(getPoint(), newXPos, playerNumber))
 			changeInX = 0;
-		if (!map.canMove(getPoint(), newYPos, this))
+		if (!map.canMove(getPoint(), newYPos, playerNumber))
 			changeInY = 0;
 
 		x += changeInX;
@@ -203,7 +203,7 @@ public class Player {
 		if (buttonActive && gunCooldown.canUse()) {
 			gunCooldown.empty();
 			Line2D inFront = Util.getRayLine(getPoint(), getLookingDirection());
-			Player nearestPlayer = map.getNearestInSightPlayer(inFront, this);
+			Player nearestPlayer = map.getNearestInSightPlayer(inFront, playerNumber);
 			if (nearestPlayer != null)
 				nearestPlayer.haveBeenShot();
 		} else {
