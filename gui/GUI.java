@@ -7,6 +7,7 @@ package raycasting.gui;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Dimension;
+import java.awt.Font;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.geom.Rectangle2D;
@@ -40,6 +41,7 @@ public class GUI extends JComponent {
 	public void paintComponent(Graphics g) {
 		super.paintComponent(g);
 		drawRectangles(g);
+		drawMoney(g);
 	}
 
 	private final ArrayList<Rectangle> rectangles = new ArrayList<Rectangle>();
@@ -60,7 +62,17 @@ public class GUI extends JComponent {
 
 		}
 	}
-
+	
+	public int moneyInBP = 0;
+	public int moneyInBase = 0;
+	private void drawMoney(Graphics g){
+		((Graphics2D) g).setPaint(new Color(255, 0, 0));
+		g.setFont(new Font("Haettenschweiler", Font.PLAIN, 20));
+		g.drawString("BackPack: $" + moneyInBP, getWidth()-131, 50);
+		g.drawString("Base: $" + moneyInBase, getWidth()-100, 70);
+		
+	}
+	
 	public void addRectangles(Rectangle rec) {
 		rectangles.add(rec);
 	}

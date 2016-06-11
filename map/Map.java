@@ -11,6 +11,7 @@ import raycasting.Util;
 import raycasting.Direction;
 import raycasting.WallProperties;
 import raycasting.World;
+import raycasting.entities.Base;
 import raycasting.entities.Entity;
 import raycasting.entities.Player;
 import raycasting.entities.Wall;
@@ -18,6 +19,7 @@ import raycasting.entities.Wall;
 import java.awt.Color;
 import java.awt.geom.Line2D;
 import java.awt.geom.Point2D;
+import java.lang.reflect.InvocationTargetException;
 
 public class Map {
 
@@ -39,12 +41,22 @@ public class Map {
 			MapData.generateMap5(this);
 			break;
 		}
+		java.lang.reflect.Method[] methods = MapData.class.getMethods();
+		for(java.lang.reflect.Method m : methods)
+			if(m.getName().equals("generateMap" + mapNumber))
+				try {
+					m.invoke(null, this);
+				} catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
+					e.printStackTrace();
+				}
+		
 	}
 
 	public final ArrayList<Wall> physicalWalls = new ArrayList<>();
 	public final HashMap<Player, Wall[]> playersToPlayerWalls = new HashMap<>();
 	public final ArrayList<Entity> entities = new ArrayList<>();
 	public final HashMap<Entity, Wall[]> entitiesToEntityWalls = new HashMap<>();
+	
 	
 	public ArrayList<Wall> getWalls() {
 		ArrayList<Wall> result = new ArrayList<Wall>();
@@ -114,8 +126,6 @@ public class Map {
 			if (x == nearestWall)
 				return null;
 		for (Player p : Player.players) {
-			if (this == p.map)
-				continue;
 			for (Wall x : playersToPlayerWalls.get(p))
 				if (x == nearestWall)
 					return p;
@@ -173,6 +183,14 @@ public class Map {
 
 	public void addEntityWallArray(Entity entity, Wall[] wallArr) {
 		entitiesToEntityWalls.put(entity, wallArr);
+	}
+
+	public Base getBase(Player p){
+		for(Entity e : entities)
+			if(e.getClass().getSimpleName().equals("Base"))
+				if(((Base) e).owner == p)
+					return ((Base) e);
+		return null;
 	}
 }
 

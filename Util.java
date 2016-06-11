@@ -14,6 +14,8 @@ import raycasting.entities.Wall;
 
 public class Util {
 
+	private static final double INVRS_SQRT_2 = 0.71;
+
 	public static double getDistance(Line2D rayLine, Wall wall) {
 		Point2D intersection = getLineLineIntersection(wall.getLine(), rayLine);
 
@@ -25,8 +27,6 @@ public class Util {
 		double distance = rayLine.getP1().distance(intersection);
 		return distance;
 	}
-
-	private static final double INVRS_SQRT_2 = 0.71;
 
 	public static Wall[] generatePlayerWalls(Player player) {
 		Wall[] result = new Wall[4];
@@ -70,7 +70,8 @@ public class Util {
 		double entityY = entity.location.getY();
 		double wallLength = entity.wallLength;
 		double wallLengthFromMiddle = wallLength * INVRS_SQRT_2;
-		Direction firstPointDirection = new Direction(0);
+		Direction firstPointDirection = new Direction(
+				World.getTicksSinceStart() % (4.0*World.FPS) / (4.0*World.FPS) * 360);
 		Point2D[] wallPoints = new Point2D[4];
 
 		for (int i = 0; i < wallPoints.length; i++) {
@@ -81,7 +82,7 @@ public class Util {
 			wallPoints[i] = wallPoint;
 		}
 		result[0] = new Wall(wallPoints[0], wallPoints[1], color);
-		result[1] = new Wall(wallPoints[1], wallPoints[2], color);
+		result[1] = new Wall(wallPoints[1], wallPoints[2], color.darker());
 		result[2] = new Wall(wallPoints[2], wallPoints[3], color);
 		result[3] = new Wall(wallPoints[3], wallPoints[0], color.darker());
 		

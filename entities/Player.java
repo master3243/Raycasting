@@ -7,7 +7,6 @@ package raycasting.entities;
 import java.awt.Color;
 import java.awt.geom.Line2D;
 import java.awt.geom.Point2D;
-import java.awt.geom.Rectangle2D;
 import java.util.ArrayList;
 
 import raycasting.Cooldown;
@@ -83,7 +82,6 @@ public class Player {
 		return new Point2D.Double(x, y);
 	}
 
-	
 	public double getMovementInOneTick() {
 		if (isRunning)
 			return runningDistancePerTick;

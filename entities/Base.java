@@ -10,7 +10,7 @@ import java.awt.geom.Point2D;
 public class Base extends Entity {
 	
 	private int money = 0;
-	private final Player owner;
+	public final Player owner;
 	
 	public Base(Point2D loc, int size, Color col, Player player) {
 		super(loc, size, col);

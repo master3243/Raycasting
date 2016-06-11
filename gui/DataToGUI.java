@@ -10,6 +10,7 @@ import java.util.ArrayList;
 import raycasting.Main;
 import raycasting.Util;
 import raycasting.WallProperties;
+import raycasting.entities.Base;
 import raycasting.entities.Entity;
 import raycasting.entities.Player;
 import raycasting.entities.Wall;
@@ -47,6 +48,7 @@ public class DataToGUI {
 
 		updatePlayerLocations();
 		updateEntityLocations();
+		updateUI();
 		
 		Rectangle[] background = getBackground();
 		gui.addRectangles(background);
@@ -75,6 +77,13 @@ public class DataToGUI {
 			Wall[] entityWalls = Util.generateEntityWalls(entity);
 			map.addEntityWallArray(entity, entityWalls);
 		}
+	}
+	
+	private void updateUI(){
+		gui.moneyInBP = player.getMoenyInBP();
+		Base temp = map.getBase(player);
+		if(temp != null)
+			gui.moneyInBase = temp.getMoney();
 	}
 	
 	private ArrayList<Rectangle> wallPropertiesToRectangles(Map map, Player player) {

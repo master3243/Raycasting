@@ -12,13 +12,14 @@ import raycasting.gui.DataToGUI;
 import raycasting.gui.GUI;
 import raycasting.map.Map;
 import raycasting.Direction;
+import raycasting.entities.Base;
 import raycasting.entities.MoneyBag;
 import raycasting.entities.Player;
 
 public class Main {
 
 	public static KeyboardInput keyboard;
-	public static final Map map = new Map(5);
+	public static final Map map = new Map(6);
 	
 	public static void main(String args[]) {
 
@@ -41,7 +42,11 @@ public class Main {
 		player2.setLookingDirection(new Direction(0));
 		DataToGUI base2 = new DataToGUI(gui2, map, player2);
 		
-		map.entities.add(new MoneyBag(new Point2D.Double(40, -180), 10, new Color(12, 12, 100), 1000));
+		
+		map.entities.add(new MoneyBag(new Point2D.Double(40, -180), 3, new Color(12, 100, 12), 1000));
+		map.entities.add(new MoneyBag(new Point2D.Double(40, -170), 3, new Color(12, 100, 12), 1000));
+		map.entities.add(new Base(new Point2D.Double(50, -180), 5, new Color(120, 100, 122), player));
+		
 		
 		GUI keyboardGUI = gui2;
 		keyboard = new KeyboardInput();

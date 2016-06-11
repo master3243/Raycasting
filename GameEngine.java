@@ -27,6 +27,7 @@ public class GameEngine {
 			for(DataToGUI o : dataToGUIs)
 				o.update();
 			map.updateEntities();
+			World.increaseTicks();
 		}
 	}
 	
