@@ -11,6 +11,7 @@ import java.awt.geom.Point2D;
 import raycasting.entities.Entity;
 import raycasting.entities.Player;
 import raycasting.entities.Wall;
+import raycasting.helperClasses.Direction;
 
 public class Util {
 
@@ -42,8 +43,7 @@ public class Util {
 		return result;
 	}
 
-	
-	private static Point2D[] generatePlayerPoints(int playerNumber){
+	public static Point2D[] generatePlayerPoints(int playerNumber){
 		Player player = Player.players.get(playerNumber);
 		
 		double playerX = player.getPoint().getX();
@@ -63,26 +63,13 @@ public class Util {
 		
 		return result;
 	}
-	
+
 	public static Wall[] generateEntityWalls(Entity entity) {
 		Wall[] result = new Wall[4];
 
 		Color color = entity.color;
-		double entityX = entity.location.getX();
-		double entityY = entity.location.getY();
-		double wallLength = entity.wallLength;
-		double wallLengthFromMiddle = wallLength * INVRS_SQRT_2;
-		Direction firstPointDirection = new Direction(
-				World.getTicksSinceStart() % (4.0*World.FPS) / (4.0*World.FPS) * 360);
-		Point2D[] wallPoints = new Point2D[4];
+		Point2D[] wallPoints = generateEntityPoints(entity);
 
-		for (int i = 0; i < wallPoints.length; i++) {
-			double pointDirection = firstPointDirection.getDirectionAddedToThis(Direction.LEFT * i).getRadValue();
-			double xExtra = wallLengthFromMiddle * Math.cos(pointDirection);
-			double yExtra = wallLengthFromMiddle * Math.sin(pointDirection);
-			Point2D wallPoint = new Point2D.Double(xExtra + entityX, yExtra + entityY);
-			wallPoints[i] = wallPoint;
-		}
 		result[0] = new Wall(wallPoints[0], wallPoints[1], color);
 		result[1] = new Wall(wallPoints[1], wallPoints[2], color.darker());
 		result[2] = new Wall(wallPoints[2], wallPoints[3], color);
@@ -96,6 +83,27 @@ public class Util {
 		return result;
 	}
 
+	public static Point2D[] generateEntityPoints(Entity entity){
+		Point2D[] result = new Point2D[4];
+		
+		double entityX = entity.location.getX();
+		double entityY = entity.location.getY();
+		double wallLength = entity.wallLength;
+		double wallLengthFromMiddle = wallLength * INVRS_SQRT_2;
+		Direction firstPointDirection = new Direction(
+				Main.gameEngine.getTicksSinceStart() % (4.0*World.FPS) / (4.0*World.FPS) * 360);
+		
+		for (int i = 0; i < result.length; i++) {
+			double pointDirection = firstPointDirection.getDirectionAddedToThis(Direction.LEFT * i).getRadValue();
+			double xExtra = wallLengthFromMiddle * Math.cos(pointDirection);
+			double yExtra = wallLengthFromMiddle * Math.sin(pointDirection);
+			Point2D wallPoint = new Point2D.Double(xExtra + entityX, yExtra + entityY);
+			result[i] = wallPoint;
+		}
+		
+		return result;
+	}
+	
 	public static Line2D getRayLine(Point2D loc, Direction direction) {
 		double xStart = loc.getX();
 		double yStart = loc.getY();

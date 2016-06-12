@@ -2,7 +2,9 @@
  * Abdulrahman Alabdulkareem 782435
  * May 26, 2016
  */
-package raycasting;
+package raycasting.helperClasses;
+
+import raycasting.World;
 
 public class Cooldown {
 	

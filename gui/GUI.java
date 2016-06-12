@@ -42,6 +42,7 @@ public class GUI extends JComponent {
 		super.paintComponent(g);
 		drawRectangles(g);
 		drawMoney(g);
+		drawOnScreenText(g);
 	}
 
 	private final ArrayList<Rectangle> rectangles = new ArrayList<Rectangle>();
@@ -70,6 +71,14 @@ public class GUI extends JComponent {
 		g.setFont(new Font("Haettenschweiler", Font.PLAIN, 20));
 		g.drawString("BackPack: $" + moneyInBP, getWidth()-131, 50);
 		g.drawString("Base: $" + moneyInBase, getWidth()-100, 70);
+		
+	}
+	
+	public String onScreenText = "";
+	private void drawOnScreenText(Graphics g){
+		((Graphics2D) g).setPaint(new Color(255, 0, 0));
+		g.setFont(new Font("Haettenschweiler", Font.PLAIN, 150));
+		g.drawString(onScreenText, getWidth()/2, getHeight()/2);
 		
 	}
 	

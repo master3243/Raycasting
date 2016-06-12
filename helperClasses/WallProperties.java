@@ -2,7 +2,7 @@
  * Abdulrahman Alabdulkareem 782435
  * May 16, 2016
  */
-package raycasting;
+package raycasting.helperClasses;
 
 import java.awt.Color;
 

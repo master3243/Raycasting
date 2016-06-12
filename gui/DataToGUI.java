@@ -8,9 +8,10 @@ import java.awt.Color;
 import java.util.ArrayList;
 
 import raycasting.Main;
-import raycasting.WallProperties;
+import raycasting.World;
 import raycasting.entities.Base;
 import raycasting.entities.Player;
+import raycasting.helperClasses.WallProperties;
 import raycasting.map.Map;
 
 public class DataToGUI {
@@ -18,7 +19,7 @@ public class DataToGUI {
 	private GUI gui;
 	private Map map;
 	private int playerNumber;
-	
+
 	private static final Color skyColor = new Color(0, 255, 255);
 	private static final Color groundColor = new Color(130, 90, 44);
 	private static final int rayHeightMultiplicationConstant = 5000; // trial-and-error
@@ -30,13 +31,44 @@ public class DataToGUI {
 		this.playerNumber = playerNumber;
 	}
 
-	public void update() {
-		updateGUI();
-		keyboard_check();
+	private boolean countingDown = false;
+	private int startTick = 0;
+	private int numberOnDisplay = 0;
+
+	public void startCountdown(int number) {
+		countingDown = true;
+		startTick = Main.gameEngine.getTicksSinceStart();
+		numberOnDisplay = number;
+		gui.onScreenText = String.valueOf(numberOnDisplay);
 	}
 
-	private void keyboard_check() {
-		Main.keyboard.poll();
+	public void updateCountdown() {
+		int oneSecond = World.FPS;
+		if (startTick + oneSecond <= Main.gameEngine.getTicksSinceStart()) {
+			startTick = Main.gameEngine.getTicksSinceStart();
+
+			if (numberOnDisplay == 1) {
+				gui.onScreenText = "GO!";
+				Main.gameEngine.kbPaused = false;
+				numberOnDisplay--;
+			} else if (numberOnDisplay == 0) {
+				gui.onScreenText = "";
+				countingDown = false;
+			} else {
+				numberOnDisplay--;
+				gui.onScreenText = String.valueOf(numberOnDisplay);
+			}
+		}
+
+	}
+
+	public void update() {
+		updateGUI();
+		if(!Main.gameEngine.kbPaused)
+			playerKeyBoardUpdate();
+	}
+
+	private void playerKeyBoardUpdate() {
 		Player p = Player.players.get(playerNumber);
 		p.updatePlayer(Main.keyboard);
 	}
@@ -44,10 +76,8 @@ public class DataToGUI {
 	private void updateGUI() {
 		gui.clearRectangles();
 
-		map.updatePlayerLocations();
-		map.updateEntityLocations();
 		updateUI();
-		
+
 		Rectangle[] background = getBackground();
 		gui.addRectangles(background);
 
@@ -56,15 +86,19 @@ public class DataToGUI {
 
 		gui.repaint();
 	}
-	
-	private void updateUI(){
+
+	private void updateUI() {
+		if (countingDown)
+			updateCountdown();
+
 		Player p = Player.players.get(playerNumber);
 		gui.moneyInBP = p.getMoenyInBP();
-		Base temp = map.getBase(playerNumber);
-		if(temp != null)
+
+		Base temp = map.getFirstBase(playerNumber);
+		if (temp != null)
 			gui.moneyInBase = temp.getMoney();
 	}
-	
+
 	private ArrayList<Rectangle> wallPropertiesToRectangles(Map map, int playerNumber) {
 		WallProperties[] wallProperties = map.generateWallPropertiesArray(playerNumber);
 		ArrayList<Rectangle> result = new ArrayList<Rectangle>();
@@ -94,7 +128,7 @@ public class DataToGUI {
 
 	private Rectangle[] getBackground() {
 		Rectangle[] result = new Rectangle[2];
-		
+
 		double playerLookingDirectionZAxis = Player.players.get(playerNumber).getLookingDirectionZAxis();
 		double middleOfLookingDirectionZAxis = gui.heightOfWindow / 2 + playerLookingDirectionZAxis;
 		Color newSkyColor = new Color(skyColor.getRGB());
@@ -133,11 +167,11 @@ public class DataToGUI {
 		newColor = new Color(red, green, blue);
 		return newColor;
 	}
-	
-	private double convertRayHeight(double distance){
-//		return rayHeightMultiplicationConstant / distance;
-//		return Math.tan(1/distance)*1000;
-		return rayHeightMultiplicationConstant / (distance+2);
+
+	private double convertRayHeight(double distance) {
+		// return rayHeightMultiplicationConstant / distance;
+		// return Math.tan(1/distance)*1000;
+		return rayHeightMultiplicationConstant / (distance + 2);
 	}
 
 }

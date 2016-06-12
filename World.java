@@ -8,16 +8,7 @@ public class World {
 	
 	public static final int width_resolution = 320;
 	public static final int draw_distance = 210;
-	public static final int FPS = 30;
+	public static final int FPS = 10;
 	public static final int millisecondsBetweenTicks = 1000/FPS;
 	
-	private static long ticksSinceStart = 0;
-	
-	public static void increaseTicks(){
-		ticksSinceStart++;
-	}
-	
-	public static long getTicksSinceStart(){
-		return ticksSinceStart;
-	}	
 }

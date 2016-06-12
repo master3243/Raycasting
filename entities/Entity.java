@@ -20,11 +20,19 @@ public abstract class Entity {
 		color = col;
 	}
 	
+	public void setLocation(Point2D newLocation){
+		location.setLocation(newLocation);
+	}
+	
 	public boolean isPlayerTouching(int playerNumber){
-		Rectangle2D entityLoc = new Rectangle2D.Double(location.getX()-wallLength/2,
-													location.getY()-wallLength/2,
-													wallLength,
-													wallLength);
+		//multiply by sqrt 2 so that the detection box is just large enough so-
+		//that if it is 45 degrees tilted the player still wont be able to clip inside
+		double SQRT_2 = 1.42;
+		double largerWallLength = SQRT_2 * wallLength;
+		Rectangle2D entityLoc = new Rectangle2D.Double(location.getX()-largerWallLength/2,
+													location.getY()-largerWallLength/2,
+													largerWallLength,
+													largerWallLength);
 		Player p = Player.players.get(playerNumber);
 		Point2D playerLoc = p.getPoint();
 		return entityLoc.contains(playerLoc);
@@ -35,5 +43,5 @@ public abstract class Entity {
 	public abstract double getWaitTime();
 	
 	public abstract String getProperties();
-	
+
 }

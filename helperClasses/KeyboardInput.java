@@ -1,4 +1,4 @@
-package raycasting;
+package raycasting.helperClasses;
 
 import java.awt.event.KeyEvent;
 

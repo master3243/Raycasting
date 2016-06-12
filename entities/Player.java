@@ -9,20 +9,19 @@ import java.awt.geom.Line2D;
 import java.awt.geom.Point2D;
 import java.util.ArrayList;
 
-import raycasting.Cooldown;
-import raycasting.Direction;
-import raycasting.KeyboardInput;
+import raycasting.Main;
 import raycasting.Util;
 import raycasting.World;
-import raycasting.map.Map;
+import raycasting.helperClasses.Cooldown;
+import raycasting.helperClasses.Direction;
+import raycasting.helperClasses.KeyboardInput;
 
 public class Player {
 
 	public static final int millisecondsBetweenTicks = World.millisecondsBetweenTicks;
 	public static final ArrayList<Player> players = new ArrayList<>();
-	private static int playerCount = 1;
+	private static int playerCount = 0;
 
-	public final Map map;
 	public final int[] controls;
 	public final int playerNumber;
 	public final Color playerColor;
@@ -42,7 +41,8 @@ public class Player {
 	public final double runningDistanceMultiplier = 2;
 	public final double runningDistancePerSecond = runningDistanceMultiplier * movementPerSecond;
 	public final double shotsPerSecond = 1;// / 2.0;
-
+	public final int maxMoneyInBP = 3000;
+	
 	private final Cooldown healthCooldown = new Cooldown(healthRegenCooldownInSeconds, 100);
 	private final Cooldown staminaCooldown = new Cooldown(staminaDurationInSeconds, staminaMinUse);
 	private final Cooldown gunCooldown = new Cooldown(shotsPerSecond, 100);
@@ -61,8 +61,7 @@ public class Player {
 	private boolean isRunning = false;
 	private int moneyInBackPack = 0;
 	
-	public Player(Map map, Color playerColor, int[] controls) {
-		this.map = map;
+	public Player(Color playerColor, int[] controls) {
 		this.controls = controls;
 		this.playerColor = playerColor;
 		players.add(this);
@@ -126,9 +125,9 @@ public class Player {
 		Point2D newXPos = new Point2D.Double(x + changeInX + minDistanceFromWallInX, y);
 		Point2D newYPos = new Point2D.Double(x, y + changeInY + minDistanceFromWallInY);
 
-		if (!map.canMove(getPoint(), newXPos, playerNumber))
+		if (!Main.map.canMove(getPoint(), newXPos, playerNumber))
 			changeInX = 0;
-		if (!map.canMove(getPoint(), newYPos, playerNumber))
+		if (!Main.map.canMove(getPoint(), newYPos, playerNumber))
 			changeInY = 0;
 
 		x += changeInX;
@@ -203,7 +202,7 @@ public class Player {
 		if (buttonActive && gunCooldown.canUse()) {
 			gunCooldown.empty();
 			Line2D inFront = Util.getRayLine(getPoint(), getLookingDirection());
-			Player nearestPlayer = map.getNearestInSightPlayer(inFront, playerNumber);
+			Player nearestPlayer = Main.map.getNearestInSightPlayer(inFront, playerNumber);
 			if (nearestPlayer != null)
 				nearestPlayer.haveBeenShot();
 		} else {
@@ -222,10 +221,16 @@ public class Player {
 	
 	public void setMoneyInBP(int money){
 		moneyInBackPack = money;
+		if(moneyInBackPack > maxMoneyInBP)
+			moneyInBackPack = maxMoneyInBP;
 	}
 	
 	public void increaseMoneyInBP(int amount){
-		moneyInBackPack += amount;
+		setMoneyInBP(getMoenyInBP() + amount);
+	}
+	
+	public boolean canRecieveMoreMoneyInBP(){
+		return getMoenyInBP() < maxMoneyInBP;
 	}
 	
 	public void updatePlayer(KeyboardInput KB) {

@@ -78,7 +78,7 @@ public class MapData {
 				{ 1, 2, 1, 0, 0, 0, 1, 2, 0, 0, 1, 2, 0, 0, 0, 0, 1, 0, 1, 2, 1 },
 				{ 1, 0, 1, 0, 1, 0, 1, 1, 1, 0, 1, 1, 1, 1, 1, 1, 1, 0, 1, 1, 1 },
 				{ 1, 0, 0, 0, 1, 0, 0, 2, 1, 2, 1, 2, 0, 0, 0, 0, 0, 0, 0, 2, 1 },
-				{ 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1 } };
+				{ 1, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1 } };
 		generateMapFromArray(map, arr, 10, color);
 	}
 
@@ -115,8 +115,8 @@ public class MapData {
 						map.physicalWalls.add(new Wall(x2, y2, x1, y2, color));
 				}
 				if (arr[r][c] == 2) {
-					map.entitySpawnLocations.add(
-							new Point2D.Double((c + 0.5) * wallLength, (-1 * (r - 0.5) * wallLength)) );
+					map.freeEntitySpawnLocations.add(
+							new Point2D.Double((c + 0.5) * wallLength, (-1 * (r + 0.5) * wallLength)) );
 				}
 			}
 	}
