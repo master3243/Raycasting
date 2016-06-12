@@ -22,7 +22,7 @@ public class DataToGUI {
 
 	private static final Color skyColor = new Color(0, 255, 255);
 	private static final Color groundColor = new Color(130, 90, 44);
-	private static final int rayHeightMultiplicationConstant = 5000; // trial-and-error
+	private static final int rayHeightMultiplicationConstant = 3000; // trial-and-error
 	private static final int damageToRedScreenMultiplicationConstant = 1; // trial-and-error
 
 	public DataToGUI(GUI gui, Map map, int playerNumber) {

@@ -70,4 +70,7 @@ public class Direction {
 		return new Direction(getValue() + added);
 	}
 	
+	public String toString(){
+		return String.valueOf(direction);
+	}
 }

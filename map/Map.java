@@ -84,6 +84,10 @@ public class Map {
 			if (closestWall == null)
 				continue;
 			double wallDistance = Util.getDistance(rayLine, closestWall);
+			//TODO remove below line, testing to remove fisheye
+			double fecdirection = Math.abs(playerDirection - rayDirection.getValue());
+			wallDistance = wallDistance * Math.cos(Math.toRadians(fecdirection));
+			
 			Color wallColor = closestWall.getColor();
 			result[i] = new WallProperties(wallDistance, wallColor);
 		}

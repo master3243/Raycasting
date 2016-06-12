@@ -31,7 +31,7 @@ public class GameEngine {
 	
 	public void startGame(){
 		updateWholeGameOneFrame();
-		startCountdown();
+//		startCountdown();
 		while (true) {
 			try {
 				Thread.sleep(World.millisecondsBetweenTicks);

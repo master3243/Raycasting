@@ -31,7 +31,7 @@ public class Player {
 	public final double zAxisrotationPerSecond = 600;
 	public final double minDistanceFromWall = 2;
 	public final double lengthOfPlayerWall = 3;
-	public final int originalPOV = 120;
+	public final int originalPOV = 60;
 	public final double maxHealth = 100;
 	public final double healthRegenPerSecond = 20;
 	public final double healthRegenCooldownInSeconds = 3;

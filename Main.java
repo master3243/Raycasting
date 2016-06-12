@@ -30,7 +30,7 @@ public class Main {
 				KeyEvent.VK_J, KeyEvent.VK_K, KeyEvent.VK_L, KeyEvent.VK_SHIFT, KeyEvent.VK_SPACE };
 		Player player = new Player(new Color(255, 0, 200), controls1);
 		player.setPoint(new Point2D.Double(20, -180));
-		player.setLookingDirection(new Direction(54));
+		player.setLookingDirection(new Direction(0));
 		DataToGUI base = new DataToGUI(gui, map, player.playerNumber);
 		
 		GUI gui2 = new GUI(600, 740);
