@@ -27,6 +27,13 @@ public class Base extends Entity {
 		this.OwnerNumber = OwnerNumber;
 	}
 
+	public Base(Point2D loc, int OwnerNumber, int money) {
+		super(loc, size, col);
+		this.OwnerNumber = OwnerNumber;
+		this.money = money;
+	}
+
+	
 	public void increaseMoney(int amount){
 		money += amount;
 	}
@@ -69,7 +76,7 @@ public class Base extends Entity {
 
 	@Override
 	public String getProperties() {
-		return "Base$" + OwnerNumber;
+		return "Base$" + OwnerNumber + "$" + money;
 	}
 
 	public static boolean belongsToThis(String properties) {
@@ -77,8 +84,9 @@ public class Base extends Entity {
 	}
 
 	public static Base returnObjectWithProperties(String properties){
-		int ownerNumber = Integer.parseInt(properties.substring(5));
-		return new Base(new Point2D.Double(), ownerNumber);
+		int ownerNumber = Integer.parseInt(properties.substring(5, properties.indexOf("$", 5)));
+		int money = Integer.parseInt(properties.substring(properties.indexOf("$", 5) + 1));
+		return new Base(new Point2D.Double(), ownerNumber, money);
 	}
 
 }

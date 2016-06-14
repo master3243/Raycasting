@@ -90,15 +90,59 @@ public class DataToGUI {
 	private void updateUI() {
 		if (countingDown)
 			updateCountdown();
-
+		
+		//Backpack money
 		Player p = Player.players.get(playerNumber);
 		gui.moneyInBP = p.getMoenyInBP();
-
+		
+		//Base money
 		Base temp = map.getFirstBase(playerNumber);
 		if (temp != null)
 			gui.moneyInBase = temp.getMoney();
+		
+		//add on screen text
+		int playerScreenBufferSize = p.getOnScreenTextBufferSize();
+		if(playerScreenBufferSize > 0){
+			for(String text : p.getOnScreenTextBuffer()){
+				int durationInSeconds = Integer.valueOf(text.substring(0, text.indexOf(":")));
+				String displayText = text.substring(text.indexOf(":") + 1);
+				addOnScreenText(displayText, durationInSeconds);		
+			}
+			//clear player buffer because already added to this classes buffer
+			p.getOnScreenTextBuffer().clear();
+		}
+		
+		//any text in middle of screen
+		updateOnScreenText();
 	}
-
+	
+	private ArrayList<String> onScreenTextBuffer = new ArrayList<>();
+	
+	private void addOnScreenText(String text, double secondsOnScreen){
+		int ticksPerSecond = World.FPS;
+		int ticksOnScreen = (int) (ticksPerSecond * secondsOnScreen);
+		onScreenTextBuffer.add(ticksOnScreen + ":" + text);
+	}
+	
+	private void updateOnScreenText(){
+		if(onScreenTextBuffer.size() == 0)
+			return;
+		String current = onScreenTextBuffer.get(0);
+		int ticksRemaining = Integer.parseInt(current.substring(0, current.indexOf(":")));
+		String text = current.substring(current.indexOf(":") + 1);
+		
+		gui.onScreenText = text;	
+		
+		if(ticksRemaining > 0){
+			ticksRemaining--;
+			onScreenTextBuffer.remove(0);
+			onScreenTextBuffer.add(0, ticksRemaining + ":" + text);
+		}else{
+			gui.onScreenText = "";
+			onScreenTextBuffer.remove(0);
+		}
+	}
+	
 	private ArrayList<Rectangle> wallPropertiesToRectangles(Map map, int playerNumber) {
 		WallProperties[] wallProperties = map.generateWallPropertiesArray(playerNumber);
 		ArrayList<Rectangle> result = new ArrayList<Rectangle>();

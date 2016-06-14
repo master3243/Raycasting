@@ -78,7 +78,7 @@ public class MapData {
 				{ 1, 2, 1, 0, 0, 0, 1, 2, 0, 0, 1, 2, 0, 0, 0, 0, 1, 0, 1, 2, 1 },
 				{ 1, 0, 1, 0, 1, 0, 1, 1, 1, 0, 1, 1, 1, 1, 1, 1, 1, 0, 1, 1, 1 },
 				{ 1, 0, 0, 0, 1, 0, 0, 2, 1, 2, 1, 2, 0, 0, 0, 0, 0, 0, 0, 2, 1 },
-				{ 1, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1 } };
+				{ 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1 } };
 		generateMapFromArray(map, arr, 10, color);
 	}
 
@@ -90,7 +90,12 @@ public class MapData {
 		result[3] = new Wall(x1, y2, x1, y1, color.darker());
 		return result;
 	}
-
+	
+	private static final Color gold = new Color(242, 198, 95);
+	private static final Color green = new Color(148, 242, 53);
+	private static final Color indigo = new Color(20, 217, 148);
+	private static final Color purple = new Color(255, 15, 255);
+	
 	public static void generateMapFromArray(Map map, int[][] arr, double wallLength, Color color) {
 		for (int r = 0; r < arr.length; r++)
 			for (int c = 0; c < arr[0].length; c++) {
@@ -99,12 +104,24 @@ public class MapData {
 					double y1 = -1 * r * wallLength;
 					double x2 = c * wallLength + wallLength;
 					double y2 = -1 * r * wallLength - wallLength;
-
+					
 					boolean generateTop = r != 0 && arr[r - 1][c] != 1;
 					boolean generateLeft = c != 0 && arr[r][c - 1] != 1;
 					boolean generateDown = r != arr.length - 1 && arr[r + 1][c] != 1;
 					boolean generateRight = c != arr[0].length - 1 && arr[r][c + 1] != 1;
-
+					if(r < arr.length/2){
+						if(c < arr.length/2){
+							color = gold;
+						} else {
+							color = green;
+						}
+					} else {
+						if(c < arr.length/2){
+							color = indigo;
+						} else {
+							color = purple;
+						}
+					}
 					if (generateTop)
 						map.physicalWalls.add(new Wall(x1, y1, x2, y1, color));
 					if (generateLeft)

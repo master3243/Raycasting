@@ -30,8 +30,14 @@ public class GameEngine {
 	}
 	
 	public void startGame(){
+		for(int i = 0; i < World.numberOfMoneyBags; i++){
+			spawnQueue.add("0:MoneyBag$1000");
+		}
+		spawnQueue.add("0:Base$0$0");
+		spawnQueue.add("0:Base$1$0");
+		
 		updateWholeGameOneFrame();
-//		startCountdown();
+		startCountdown();
 		while (true) {
 			try {
 				Thread.sleep(World.millisecondsBetweenTicks);
@@ -55,12 +61,16 @@ public class GameEngine {
 		updateSpawnQueue();
 		for(DataToGUI o : dataToGUIs)
 			o.update();
+		
 		ticksSinceStart++;
 		
-		if(ticksSinceStart == 6){
+		if(ticksSinceStart == 2){
 			Player.players.get(0).setPoint(map.getFirstBase(0).location);
 			Player.players.get(1).setPoint(map.getFirstBase(1).location);
 		}
+		
+		if(ticksSinceStart >= 10 && gameEnded())
+			stopGame();
 	}
 
 	public void updateEntities(){
@@ -88,11 +98,43 @@ public class GameEngine {
 		}
 	}
 
+	private boolean gameEnded(){
+		for(int i = 0; i < Player.players.size(); i++){
+			Base base = map.getFirstBase(i);
+			if(base == null)
+				continue;
+			if(base.getMoney() >= World.goalMoney)
+				return true;
+		}
+		return false;
+		
+	}
+
+	private void stopGame(){
+		kbPaused = true;
+		for(int i = 0; i < Player.players.size(); i++){
+			Player.players.get(i).addOnScreenBuffer(Integer.MAX_VALUE + ":GameEnd");
+		}
+	}
+	
 	public int getTicksSinceStart(){
 		return ticksSinceStart;
 	}
 	
 	public void removeEntity(Entity e){
+		if(e instanceof Base){
+			int ownerNumber = ((Base)e).OwnerNumber;
+			//display "Base Sabotaged" for 3 seconds to the owner of the base
+			Player.players.get(ownerNumber).addOnScreenBuffer("3:Base Sabotaged!");
+			
+			//display "Player ownerNum Base Sabotaged"
+			for(int i = 0; i < Player.players.size(); i++){
+				if (i == ownerNumber)
+					continue;
+				Player.players.get(i).addOnScreenBuffer("3:Player " + ownerNumber + " Base Sabotaged!");
+			}	
+		}
+		
 		map.freeEntitySpawnLocations.add(e.location);
 		respawnEntity(e);
 		map.entities.remove(e);

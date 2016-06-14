@@ -8,6 +8,7 @@ import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Font;
+import java.awt.FontMetrics;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.geom.Rectangle2D;
@@ -42,7 +43,7 @@ public class GUI extends JComponent {
 		super.paintComponent(g);
 		drawRectangles(g);
 		drawMoney(g);
-		drawOnScreenText(g);
+		drawCenteredString(g);
 	}
 
 	private final ArrayList<Rectangle> rectangles = new ArrayList<Rectangle>();
@@ -75,11 +76,40 @@ public class GUI extends JComponent {
 	}
 	
 	public String onScreenText = "";
-	private void drawOnScreenText(Graphics g){
-		((Graphics2D) g).setPaint(new Color(255, 0, 0));
-		g.setFont(new Font("Haettenschweiler", Font.PLAIN, 150));
-		g.drawString(onScreenText, getWidth()/2, getHeight()/2);
-		
+	
+	/**
+	 * Draw a String centered in the middle of a Rectangle.
+	 *
+	 * @param g The Graphics instance.
+	 * @param text The String to draw.
+	 * @param rect The Rectangle to center the text in.
+	 */
+	public void drawCenteredString(Graphics g) {
+	    String text = onScreenText;
+	    java.awt.Rectangle rect = new java.awt.Rectangle(15, 15, getWidth()-15, getHeight()-15);
+	    
+	    //make sure font is not too big
+	    int fontSize = 100;
+	    FontMetrics metrics;
+	    Font font;
+	    while(true){
+	    	font = new Font("Haettenschweiler", Font.PLAIN, fontSize);
+	    	// Get the FontMetrics
+	    	metrics = g.getFontMetrics(font);
+	    	if (metrics.stringWidth(text) < rect.width)
+	    		break;
+	    	fontSize--;
+	    }
+	    // Determine the X coordinate for the text
+	    int x = (int) ((rect.width - metrics.stringWidth(text)) / 2);
+	    // Determine the Y coordinate for the text (note we add the ascent, as in java 2d 0 is top of the screen)
+	    int y = (int) (((rect.height - metrics.getHeight()) / 2) + metrics.getAscent());
+	    // Set the font
+	    g.setFont(font);
+	    // Draw the String
+	    g.drawString(text, x, y);
+	    // Dispose the Graphics
+	    g.dispose();
 	}
 	
 	public void addRectangles(Rectangle rec) {

@@ -25,20 +25,20 @@ public class Player {
 	public final int[] controls;
 	public final int playerNumber;
 	public final Color playerColor;
-	public final double movementPerSecond = 20;
+	public final double movementPerSecond = 30;
 	public final double rotationPerSecond = 180;
 	public final double zAxisMaxRotation = 400;
 	public final double zAxisrotationPerSecond = 600;
 	public final double minDistanceFromWall = 2;
 	public final double lengthOfPlayerWall = 3;
-	public final int originalPOV = 60;
+	public final int originalPOV = 90;
 	public final double maxHealth = 100;
 	public final double healthRegenPerSecond = 20;
 	public final double healthRegenCooldownInSeconds = 3;
 	public final double damagePerBullet = 50;
 	public final double staminaDurationInSeconds = 2;
 	public final double staminaMinUse = 50;
-	public final double runningDistanceMultiplier = 2;
+	public final double runningDistanceMultiplier = 1.5;
 	public final double runningDistancePerSecond = runningDistanceMultiplier * movementPerSecond;
 	public final double shotsPerSecond = 1;// / 2.0;
 	public final int maxMoneyInBP = 3000;
@@ -60,6 +60,8 @@ public class Player {
 	private double health = maxHealth;
 	private boolean isRunning = false;
 	private int moneyInBackPack = 0;
+	private ArrayList<String> onScreenTextBuffer = new ArrayList<>();// "seconds:textToDisplayOnScreen"
+	
 	
 	public Player(Color playerColor, int[] controls) {
 		this.controls = controls;
@@ -82,10 +84,13 @@ public class Player {
 	}
 
 	public double getMovementInOneTick() {
+		double result;
 		if (isRunning)
-			return runningDistancePerTick;
+			result = runningDistancePerTick;
 		else
-			return movementPerTick;
+			result = movementPerTick;
+		result *= health/maxHealth;
+		return result;
 	}
 
 	public double getDegreeBetweenRays() {
@@ -213,6 +218,8 @@ public class Player {
 	public void haveBeenShot() {
 		healthCooldown.empty();
 		health -= damagePerBullet;
+		if(health < 0)
+			health = 0;
 	}
 	
 	public int getMoenyInBP(){
@@ -233,12 +240,24 @@ public class Player {
 		return getMoenyInBP() < maxMoneyInBP;
 	}
 	
+	public void addOnScreenBuffer(String info){
+		onScreenTextBuffer.add(info);
+	}
+	
+	public ArrayList<String> getOnScreenTextBuffer(){
+		return onScreenTextBuffer;
+	}
+	
+	public int getOnScreenTextBufferSize(){
+		return onScreenTextBuffer.size();
+	}
+	
 	public void updatePlayer(KeyboardInput KB) {
 
 		healthUpdate();
 		staminaUpdate(KB.keyDown(controls[8]));
 		shoot(KB.keyDown(controls[9]));
-
+		
 		if (KB.keyDown(controls[0]))
 			moveOneFrameForward();
 		if (KB.keyDown(controls[1]))
@@ -255,7 +274,6 @@ public class Player {
 			lookDownOneFrame();
 		if (KB.keyDown(controls[7]))
 			rotateOneFrameRight();
-
 	}
 
 }

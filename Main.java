@@ -6,15 +6,10 @@ package raycasting;
 
 import java.awt.Color;
 import java.awt.event.KeyEvent;
-import java.awt.geom.Point2D;
-
 import raycasting.gui.DataToGUI;
 import raycasting.gui.GUI;
-import raycasting.helperClasses.Direction;
 import raycasting.helperClasses.KeyboardInput;
 import raycasting.map.Map;
-import raycasting.entities.Base;
-import raycasting.entities.MoneyBag;
 import raycasting.entities.Player;
 
 public class Main {
@@ -22,26 +17,41 @@ public class Main {
 	public static KeyboardInput keyboard;
 	public static final Map map = new Map(5);
 	public static GameEngine gameEngine;
+	private static final int[] controlsPlayer1 = new int[]{
+			KeyEvent.VK_W    //move up
+			, KeyEvent.VK_A  //move left
+			, KeyEvent.VK_S  //move down
+			, KeyEvent.VK_D  //move right
+			, KeyEvent.VK_I  //look up
+			, KeyEvent.VK_J  //look left
+			, KeyEvent.VK_K  //look down
+			, KeyEvent.VK_L  //look right
+			, KeyEvent.VK_SHIFT  //sprint
+			, KeyEvent.VK_SPACE  //shoot tranqulizer
+	};
+	private static final int[] controlsPlayer2 = new int[]{
+			KeyEvent.VK_UP         //move up
+			, KeyEvent.VK_LEFT     //move left
+			, KeyEvent.VK_DOWN     //move down
+			, KeyEvent.VK_RIGHT    //move right
+			, KeyEvent.VK_NUMPAD5  //look up
+			, KeyEvent.VK_NUMPAD1  //look left
+			, KeyEvent.VK_NUMPAD2  //look down
+			, KeyEvent.VK_NUMPAD3  //look right
+			, KeyEvent.VK_NUMPAD0  //sprint
+			, KeyEvent.VK_PERIOD   //shoot tranqulizer
+	};
+	
 	
 	public static void main(String args[]) {
 
 		GUI gui = new GUI(600, 740);
-		int[] controls1 = new int[] { KeyEvent.VK_W, KeyEvent.VK_A, KeyEvent.VK_S, KeyEvent.VK_D, KeyEvent.VK_I,
-				KeyEvent.VK_J, KeyEvent.VK_K, KeyEvent.VK_L, KeyEvent.VK_SHIFT, KeyEvent.VK_SPACE };
-		Player player = new Player(new Color(255, 0, 200), controls1);
-		player.setPoint(new Point2D.Double(20, -180));
-		player.setLookingDirection(new Direction(0));
+		Player player = new Player(new Color(255, 0, 200), controlsPlayer1);
 		DataToGUI base = new DataToGUI(gui, map, player.playerNumber);
 		
 		GUI gui2 = new GUI(600, 740);
 		gui2.frame.setLocation(700, 0);
-		int[] controls2 = new int[] { KeyEvent.VK_UP, KeyEvent.VK_LEFT, KeyEvent.VK_DOWN, KeyEvent.VK_RIGHT,
-				KeyEvent.VK_NUMPAD5, KeyEvent.VK_NUMPAD1, KeyEvent.VK_NUMPAD2, KeyEvent.VK_NUMPAD3, KeyEvent.VK_NUMPAD0,
-				KeyEvent.VK_PERIOD };
-		Player player2 = new Player(new Color(255, 215, 0), controls2);
-		player2.setPoint(new Point2D.Double(195, -35));
-		player2.setPoint(new Point2D.Double(25, -165));
-		player2.setLookingDirection(new Direction(0));
+		Player player2 = new Player(new Color(255, 215, 0), controlsPlayer2);
 		DataToGUI base2 = new DataToGUI(gui2, map, player2.playerNumber);
 		
 		GUI keyboardGUI = gui2;
@@ -51,17 +61,6 @@ public class Main {
 		keyboardGUI.frame.requestFocusInWindow();
 
 		gameEngine = new GameEngine(map, new DataToGUI[]{base, base2});
-		
-		gameEngine.spawnQueue.add("0:MoneyBag$1000");
-		gameEngine.spawnQueue.add("0:MoneyBag$1000");
-		gameEngine.spawnQueue.add("0:MoneyBag$1000");
-		gameEngine.spawnQueue.add("0:MoneyBag$1000");
-		gameEngine.spawnQueue.add("0:MoneyBag$1000");
-		gameEngine.spawnQueue.add("0:MoneyBag$1000");
-		
-		gameEngine.spawnQueue.add("0:Base$0");
-		gameEngine.spawnQueue.add("0:Base$1");
-		
 		gameEngine.startGame();
 		
 	}

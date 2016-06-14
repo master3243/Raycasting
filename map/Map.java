@@ -32,7 +32,7 @@ public class Map {
 				} catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
 					e.printStackTrace();
 				}
-		
+
 	}
 	
 	public final ArrayList<Point2D> freeEntitySpawnLocations = new ArrayList<>();
@@ -177,9 +177,8 @@ public class Map {
 
 	public boolean collidesWithWall(Line2D line, int playerNumberToIgnore) {
 		for (Wall wall : getWalls()) {
-			if (wall.intersectsLine(line) && !wallBelongsToPlayer(wall, playerNumberToIgnore))
-				if (!wall.isWalkable)
-					return true;
+			if (wall.intersectsLine(line) && !wallBelongsToPlayer(wall, playerNumberToIgnore) && !wall.isWalkable)
+				return true;
 		}
 		return false;
 	}
